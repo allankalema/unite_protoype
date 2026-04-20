@@ -1,61 +1,70 @@
 {% extends 'base.html' %}
 {% block title %}Learn {{ course.title }}{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="bg-white border rounded-xl p-6 mb-6">
-        <h1 class="text-3xl font-bold">{{ course.title }}</h1>
+<section class="max-w-7xl mx-auto px-4 py-10 space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl p-6">
+        <h1 class="text-3xl font-bold text-unite-navy">{{ course.title }}</h1>
         <p class="text-slate-600 mt-2">{{ course.description|truncatechars:220 }}</p>
-        <p class="text-sm text-slate-600 mt-2">Instructor: {{ instructor_name }} ({{ institution_name }})</p>
-        <div class="mt-4">
-            <p class="text-sm text-slate-600">Overall Progress: <span class="font-semibold">{{ progress }}%</span></p>
-            <div class="mt-2 bg-slate-200 rounded-full h-3"><div class="bg-emerald-600 h-3 rounded-full" style="width: {{ progress }}%"></div></div>
-            <p class="text-sm text-slate-500 mt-2">{{ completed_lessons }} of {{ total_lessons }} lessons completed</p>
-            <p class="text-sm text-slate-500">Average quiz score: {{ average_score }}%</p>
+        <p class="text-sm text-slate-600 mt-2">Instructor: <span class="font-medium">{{ instructor_name }}</span> • {{ institution_name }}</p>
+        <div class="mt-5">
+            <div class="flex flex-wrap justify-between text-sm gap-2">
+                <p class="text-slate-600">Overall Progress</p>
+                <p class="font-semibold text-unite-navy">{{ progress }}%</p>
+            </div>
+            <div class="mt-2 bg-slate-200 rounded-full h-3 overflow-hidden"><div class="bg-unite-blue h-3 rounded-full" style="width: {{ progress }}%"></div></div>
+            <div class="mt-2 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
+                <p>{{ completed_lessons }} of {{ total_lessons }} lessons completed</p>
+                <p>Average quiz score: {{ average_score }}%</p>
+            </div>
         </div>
-    </div>
+    </header>
 
     <div class="grid lg:grid-cols-3 gap-6">
         <aside class="lg:col-span-1 space-y-4">
             {% for module in course.modules.all %}
-                <div class="bg-white border rounded-xl p-4">
-                    <h3 class="font-bold">Module {{ module.order }}: {{ module.title }}</h3>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <h3 class="font-semibold text-unite-navy">Module {{ module.order }}: {{ module.title }}</h3>
                     <ul class="mt-3 space-y-2 text-sm">
                         {% for lesson in module.lessons.all %}
-                            <li class="flex items-center justify-between">
-                                <a href="{% url 'courses:lesson-detail' lesson.id %}" class="hover:text-unite-700">{{ lesson.title }}</a>
-                                {% if lesson.id in completed_ids %}<span class="text-emerald-700">Done</span>{% endif %}
+                            <li class="flex items-center justify-between gap-2">
+                                <a href="{% url 'courses:lesson-detail' lesson.id %}" class="hover:text-unite-blue">{{ lesson.title }}</a>
+                                {% if lesson.id in completed_ids %}<span class="text-emerald-700 text-xs font-semibold">Done</span>{% endif %}
                             </li>
                         {% empty %}
-                            <li class="text-slate-500">No lessons yet.</li>
+                            <li class="text-slate-500 text-sm">No lessons yet.</li>
                         {% endfor %}
                     </ul>
                 </div>
             {% empty %}
-                <div class="bg-white border rounded-xl p-4 text-slate-500">No modules set up yet.</div>
+                <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-4 text-slate-500 text-sm">No modules have been set up yet.</div>
             {% endfor %}
         </aside>
 
-        <section class="lg:col-span-2 space-y-4">
-            <div class="bg-white border rounded-xl p-5">
-                <h2 class="font-bold text-xl">Quizzes</h2>
+        <section class="lg:col-span-2 space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                <h2 class="font-semibold text-xl text-unite-navy">Quizzes</h2>
                 <div class="mt-3 space-y-2">
                     {% for quiz in course.quizzes.all %}
-                        <a href="{% url 'courses:quiz-detail' quiz.id %}" class="block border rounded-lg p-3 hover:bg-slate-50">{{ quiz.title }}</a>
+                        <a href="{% url 'courses:quiz-detail' quiz.id %}" class="block border border-slate-200 rounded-xl p-3 hover:bg-slate-50">
+                            <p class="font-medium text-unite-navy">{{ quiz.title }}</p>
+                            <p class="text-xs text-slate-500 mt-1">Max attempts: {{ quiz.max_attempts }}</p>
+                        </a>
                     {% empty %}
-                        <p class="text-slate-500">No quizzes configured yet.</p>
+                        <p class="text-sm text-slate-500">No quizzes configured for this course yet.</p>
                     {% endfor %}
                 </div>
             </div>
-            <div class="bg-white border rounded-xl p-5">
-                <h2 class="font-bold text-xl">Certificate Status</h2>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                <h2 class="font-semibold text-xl text-unite-navy">Certificate Status</h2>
                 {% if certificate %}
-                    <p class="text-emerald-700 mt-2">Your certificate is ready.</p>
-                    <a href="{% url 'certificates:detail' certificate.id %}" class="inline-block mt-3 bg-emerald-600 text-white px-4 py-2 rounded-lg">Open Certificate</a>
+                    <p class="text-emerald-700 mt-2">Your certificate is ready for verification and printing.</p>
+                    <a href="{% url 'certificates:detail' certificate.id %}" class="inline-flex items-center gap-2 mt-3 px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold hover:opacity-90">Open Certificate <i class="fa-solid fa-certificate"></i></a>
                 {% else %}
-                    <p class="text-slate-600 mt-2">Complete all lessons and pass a quiz with at least {{ course.passing_score }}% to unlock certificate.</p>
+                    <p class="text-slate-600 mt-2">Complete all lessons and pass at least one quiz with {{ course.passing_score }}% to unlock your certificate.</p>
                 {% endif %}
             </div>
         </section>
     </div>
-</div>
+</section>
 {% endblock %}

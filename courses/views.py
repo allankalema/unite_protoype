@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from ai_tutor.forms import AIChatForm
+from ai_tutor.models import ChatSession
 from ai_tutor.services import generate_lesson_summary
 from certificates.services import get_or_create_certificate_if_eligible
 
@@ -46,6 +48,18 @@ def _course_instructor_info(course):
         if profile.institution_name:
             institution_name = profile.institution_name
     return instructor_name, institution_name
+
+
+def _get_or_create_lesson_session(user, course, lesson):
+    existing = ChatSession.objects.filter(user=user, course=course, lesson=lesson).first()
+    if existing:
+        return existing
+    return ChatSession.objects.create(
+        user=user,
+        course=course,
+        lesson=lesson,
+        title=f"{lesson.title} Tutor",
+    )
 
 
 def course_list_view(request):
@@ -182,6 +196,9 @@ def lesson_detail_view(request, lesson_id):
     prev_lesson_id = lesson_sequence[index - 1] if index > 0 else None
     next_lesson_id = lesson_sequence[index + 1] if index < len(lesson_sequence) - 1 else None
     modules = course.modules.prefetch_related("lessons").all()
+    chat_session = _get_or_create_lesson_session(request.user, course, lesson)
+    chat_messages = chat_session.messages.all()
+    chat_form = AIChatForm()
 
     return render(
         request,
@@ -194,6 +211,9 @@ def lesson_detail_view(request, lesson_id):
             "next_lesson_id": next_lesson_id,
             "modules": modules,
             "lesson_type_label": _lesson_type_label(lesson),
+            "chat_session": chat_session,
+            "chat_messages": chat_messages,
+            "chat_form": chat_form,
         },
     )
 

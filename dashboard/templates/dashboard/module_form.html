@@ -2,12 +2,14 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 py-10">
-    <div class="bg-white border rounded-xl p-6">
-        <h1 class="text-2xl font-bold mb-5">{{ title }}</h1>
+    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+        <h1 class="text-2xl font-bold mb-5 text-unite-navy">{{ title }}</h1>
         <form method="post" class="space-y-4">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button class="bg-unite-600 text-white px-5 py-2 rounded-lg" type="submit">Save</button>
+            {% for field in form %}
+                {% include 'partials/form_field.html' with field=field %}
+            {% endfor %}
+            <button class="bg-unite-orange text-white px-5 py-2.5 rounded-xl font-semibold hover:opacity-90" type="submit" data-loading="1">Save</button>
         </form>
     </div>
 </div>

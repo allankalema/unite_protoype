@@ -1,39 +1,65 @@
 {% extends 'base.html' %}
 {% block title %}Course Catalog | UNITE eLearn{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Training Courses</h1>
-        {% if request.user.is_authenticated %}<a href="{% url 'courses:my-courses' %}" class="text-unite-700 font-semibold">My Courses</a>{% endif %}
-    </div>
-    <div class="grid md:grid-cols-3 gap-6">
+<section class="max-w-7xl mx-auto px-4 py-10">
+    <header class="flex flex-wrap justify-between items-end gap-4 mb-7">
+        <div>
+            <h1 class="text-3xl font-bold text-unite-navy">Teacher Training Courses</h1>
+            <p class="text-slate-600 mt-2 max-w-2xl">Explore structured courses designed for classroom impact, continuous professional development, and practical teacher support.</p>
+        </div>
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'courses:my-courses' %}" class="inline-flex items-center gap-2 text-sm font-semibold text-unite-blue hover:underline">
+                <i class="fa-solid fa-book-open-reader"></i> View My Courses
+            </a>
+        {% endif %}
+    </header>
+
+    <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {% for row in course_rows %}
             {% with course=row.course %}
-            <article class="bg-white border rounded-xl overflow-hidden shadow-sm">
-                <div class="p-5">
-                    <h2 class="text-lg font-bold">{{ course.title }}</h2>
-                    <p class="text-slate-600 mt-2">{{ course.short_description }}</p>
-                    <div class="mt-3 flex flex-wrap gap-2 text-xs">
-                        {% if course.category %}<span class="px-2 py-1 rounded bg-slate-100">{{ course.category }}</span>{% endif %}
-                        <span class="px-2 py-1 rounded bg-sky-100 text-sky-700">{{ course.get_level_display }}</span>
+                <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                    {% if course.cover_image %}
+                        <img src="{{ course.cover_image }}" alt="{{ course.title }}" class="h-44 w-full object-cover">
+                    {% else %}
+                        <div class="h-44 bg-gradient-to-br from-orange-100 via-white to-blue-100 grid place-items-center text-unite-blue">
+                            <div class="text-center">
+                                <i class="fa-solid fa-chalkboard-teacher text-2xl"></i>
+                                <p class="mt-2 text-xs text-slate-500">Course Cover</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex flex-wrap items-center gap-2 text-xs">
+                            {% if course.category %}<span class="px-2 py-1 rounded-full bg-slate-100 text-slate-700">{{ course.category }}</span>{% endif %}
+                            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700">{{ course.get_level_display }}</span>
+                            {% if course.id in enrolled_course_ids %}
+                                <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Enrolled</span>
+                            {% endif %}
+                        </div>
+
+                        <h2 class="text-lg font-semibold mt-4">{{ course.title }}</h2>
+                        <p class="text-sm text-slate-600 mt-2 line-clamp-3">{{ course.short_description }}</p>
+
+                        <div class="mt-4 space-y-1.5 text-xs text-slate-600">
+                            <p class="flex items-center gap-2"><i class="fa-regular fa-clock text-unite-blue"></i>{{ course.estimated_duration_hours }} hours</p>
+                            <p class="flex items-center gap-2"><i class="fa-solid fa-user text-unite-blue"></i>{{ row.instructor_name }}</p>
+                            <p class="flex items-center gap-2"><i class="fa-solid fa-building-columns text-unite-blue"></i>{{ row.institution_name }}</p>
+                        </div>
+
+                        <a href="{% url 'courses:detail' course.slug %}" class="inline-flex items-center justify-center gap-2 mt-5 px-4 py-2.5 rounded-xl bg-unite-orange text-white font-semibold hover:opacity-90 transition-opacity">
+                            View Details <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     </div>
-                    <div class="mt-4 flex justify-between items-center text-sm">
-                        <span class="px-2 py-1 rounded bg-slate-100">{{ course.estimated_duration_hours }} hrs</span>
-                        {% if course.id in enrolled_course_ids %}
-                            <span class="text-emerald-700 font-semibold">Enrolled</span>
-                        {% endif %}
-                    </div>
-                    <div class="mt-3 text-xs text-slate-600">
-                        <p>Instructor: {{ row.instructor_name }}</p>
-                        <p>Institution: {{ row.institution_name }}</p>
-                    </div>
-                    <a href="{% url 'courses:detail' course.slug %}" class="inline-block mt-4 bg-unite-600 text-white px-4 py-2 rounded-lg">View Details</a>
-                </div>
-            </article>
+                </article>
             {% endwith %}
         {% empty %}
-            <div class="md:col-span-3 bg-white border rounded-xl p-6 text-slate-600">No courses are published yet.</div>
+            <div class="md:col-span-2 xl:col-span-3 bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center">
+                <i class="fa-solid fa-book text-3xl text-slate-400"></i>
+                <h2 class="mt-3 text-lg font-semibold text-unite-navy">No courses available yet</h2>
+                <p class="mt-1 text-sm text-slate-500">Check back soon for newly published teacher training content.</p>
+            </div>
         {% endfor %}
     </div>
-</div>
+</section>
 {% endblock %}

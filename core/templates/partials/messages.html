@@ -1,9 +1,17 @@
 {% if messages %}
 <div class="max-w-7xl mx-auto px-4 mt-4 no-print">
-    {% for message in messages %}
-        <div class="mb-2 px-4 py-3 rounded-lg border {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-700{% elif message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-700{% else %}bg-sky-50 border-sky-200 text-sky-800{% endif %}">
-            {{ message }}
-        </div>
-    {% endfor %}
+    <div class="animate-[fadeIn_.2s_ease-out]">
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                {% include 'partials/alert.html' with level='error' text=message alert_id=forloop.counter %}
+            {% elif message.tags == 'success' %}
+                {% include 'partials/alert.html' with level='success' text=message alert_id=forloop.counter %}
+            {% elif message.tags == 'warning' %}
+                {% include 'partials/alert.html' with level='warning' text=message alert_id=forloop.counter %}
+            {% else %}
+                {% include 'partials/alert.html' with level='info' text=message alert_id=forloop.counter %}
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
 {% endif %}

@@ -1,0 +1,17 @@
+{% if href %}
+<a href="{{ href }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all
+    {% if variant == 'primary' %}bg-unite-orange text-white hover:opacity-90{% endif %}
+    {% if variant == 'secondary' %}bg-unite-blue text-white hover:opacity-90{% endif %}
+    {% if variant == 'ghost' %}bg-slate-100 text-unite-navy hover:bg-slate-200{% endif %}
+    {% if full %}w-full{% endif %}">
+    {% if icon %}<i class="{{ icon }}"></i>{% endif %}{{ label }}
+</a>
+{% else %}
+<button type="{{ type|default:'button' }}" {% if loading %}data-loading="1"{% endif %} class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all disabled:opacity-60
+    {% if variant == 'primary' %}bg-unite-orange text-white hover:opacity-90{% endif %}
+    {% if variant == 'secondary' %}bg-unite-blue text-white hover:opacity-90{% endif %}
+    {% if variant == 'ghost' %}bg-slate-100 text-unite-navy hover:bg-slate-200{% endif %}
+    {% if full %}w-full{% endif %}">
+    {% if icon %}<i class="{{ icon }}"></i>{% endif %}{{ label }}
+</button>
+{% endif %}

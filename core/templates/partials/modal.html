@@ -1,0 +1,16 @@
+<div id="{{ modal_id }}" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-slate-900/50" data-close-modal="{{ modal_id }}"></div>
+    <div class="relative h-full flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-xl">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-slate-200">
+                <h3 class="font-semibold text-unite-navy">{{ title }}</h3>
+                <button type="button" data-close-modal="{{ modal_id }}" class="h-9 w-9 rounded-lg hover:bg-slate-100">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                {{ content|safe }}
+            </div>
+        </div>
+    </div>
+</div>

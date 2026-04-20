@@ -4,18 +4,18 @@
 <div class="max-w-7xl mx-auto px-4 py-10">
     <div class="flex justify-between items-center mb-5">
         <h1 class="text-2xl font-bold">Manage Quizzes</h1>
-        <a class="bg-unite-600 text-white px-4 py-2 rounded-lg" href="{% url 'dashboard:create-quiz' %}">Create Quiz</a>
+        <a class="bg-unite-orange text-white px-4 py-2 rounded-xl" href="{% url 'dashboard:create-quiz' %}">Create Quiz</a>
     </div>
     <div class="space-y-4">
         {% for quiz in quizzes %}
-            <div class="bg-white border rounded-xl p-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
                 <div class="flex justify-between gap-3">
                     <div>
                         <h2 class="font-bold">{{ quiz.title }}</h2>
                         <p class="text-sm text-slate-600">Course: {{ quiz.course.title }} | Questions: {{ quiz.questions.count }} | Max attempts: {{ quiz.max_attempts }}</p>
                     </div>
                     <div class="text-sm">
-                        <a class="text-unite-700" href="{% url 'dashboard:edit-quiz' quiz.id %}">Edit Quiz</a> |
+                        <a class="text-unite-blue" href="{% url 'dashboard:edit-quiz' quiz.id %}">Edit Quiz</a> |
                         <a class="text-rose-700" href="{% url 'dashboard:delete-quiz' quiz.id %}">Delete Quiz</a>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                     {% for question in quiz.questions.all %}
                         <div class="mt-2 text-sm border rounded p-2 bg-slate-50">
                             {{ forloop.counter }}. {{ question.text|truncatechars:90 }}
-                            <span class="float-right"><a class="text-unite-700" href="{% url 'dashboard:edit-question' question.id %}">Edit</a> | <a class="text-rose-700" href="{% url 'dashboard:delete-question' question.id %}">Delete</a></span>
+                            <span class="float-right"><a class="text-unite-blue" href="{% url 'dashboard:edit-question' question.id %}">Edit</a> | <a class="text-rose-700" href="{% url 'dashboard:delete-question' question.id %}">Delete</a></span>
                         </div>
                     {% empty %}
                         <p class="mt-2 text-sm text-slate-500">No questions yet.</p>
@@ -32,7 +32,7 @@
                 </div>
             </div>
         {% empty %}
-            <div class="bg-white border rounded-xl p-6">No quizzes yet.</div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6">No quizzes yet.</div>
         {% endfor %}
     </div>
 </div>

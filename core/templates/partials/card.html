@@ -1,0 +1,11 @@
+<section class="bg-white border border-slate-200 rounded-2xl shadow-sm {{ class_name }}">
+    {% if title %}
+        <header class="px-6 pt-5">
+            <h3 class="text-lg font-semibold text-unite-navy">{{ title }}</h3>
+            {% if subtitle %}<p class="text-sm text-slate-600 mt-1">{{ subtitle }}</p>{% endif %}
+        </header>
+    {% endif %}
+    <div class="p-6 {% if title %}pt-4{% endif %}">
+        {{ body|safe }}
+    </div>
+</section>

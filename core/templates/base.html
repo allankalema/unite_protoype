@@ -1,9 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}UNITE eLearn{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'UNITE_Logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,12 +14,12 @@
                 extend: {
                     colors: {
                         unite: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a'
-                        }
+                            orange: '#f97316',
+                            blue: '#2563eb',
+                            navy: '#0f172a',
+                            gray: '#f1f5f9',
+                            'gray-ink': '#475569'
+                        },
                     }
                 }
             }
@@ -27,22 +30,57 @@
             .no-print { display: none !important; }
             body { background: white !important; }
         }
+        body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
         input[type="text"], input[type="email"], input[type="password"], input[type="url"], input[type="number"], textarea, select {
             width: 100%;
             border: 1px solid #cbd5e1;
-            border-radius: 0.5rem;
-            padding: 0.6rem 0.75rem;
+            border-radius: 0.75rem;
+            padding: 0.7rem 0.85rem;
             background: #fff;
+            color: #0f172a;
+            transition: all .2s ease;
         }
-        label { display: block; margin-bottom: 0.35rem; font-weight: 600; color: #334155; }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        label { display: block; margin-bottom: 0.35rem; font-weight: 600; color: #0f172a; }
+        .page-fade { animation: fadeIn .25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-unite-gray text-unite-navy min-h-screen flex flex-col">
     {% include 'partials/navbar.html' %}
-    <main class="flex-grow">
+    <main class="flex-grow page-fade">
         {% include 'partials/messages.html' %}
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
+    <script>
+        document.addEventListener("click", function (event) {
+            const btn = event.target.closest("[data-dismiss-target]");
+            if (!btn) return;
+            const selector = btn.getAttribute("data-dismiss-target");
+            const target = document.querySelector(selector);
+            if (!target) return;
+            target.classList.add("opacity-0", "translate-y-1");
+            setTimeout(() => target.remove(), 220);
+        });
+
+        document.addEventListener("submit", function (event) {
+            const form = event.target;
+            const submitButton = form.querySelector("button[type='submit'][data-loading]");
+            if (!submitButton || submitButton.disabled) return;
+            submitButton.disabled = true;
+            submitButton.dataset.originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded-full border-2 border-white/80 border-t-transparent animate-spin"></span>Processing...</span>';
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

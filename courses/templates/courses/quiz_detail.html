@@ -1,65 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}{{ quiz.title }} | Quiz{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-10">
-    <div class="bg-white border rounded-xl p-6">
-        <h1 class="text-2xl font-bold">{{ quiz.title }}</h1>
+<section class="max-w-4xl mx-auto px-4 py-10">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+        <h1 class="text-2xl font-bold text-unite-navy">{{ quiz.title }}</h1>
         <p class="text-slate-600 mt-2">{{ quiz.description }}</p>
-        <p class="mt-2 text-sm">Passing score for this course: <span class="font-semibold">{{ quiz.course.passing_score }}%</span></p>
-        <p class="mt-1 text-sm">Attempt limit: <span class="font-semibold">{{ quiz.max_attempts }}</span> | Used: <span class="font-semibold">{{ attempts_count|default:0 }}</span> | Remaining: <span class="font-semibold">{{ attempts_remaining|default:quiz.max_attempts }}</span></p>
+
+        <div class="mt-4 grid sm:grid-cols-3 gap-3 text-sm">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><p class="text-slate-500">Passing Score</p><p class="font-semibold">{{ quiz.course.passing_score }}%</p></div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><p class="text-slate-500">Attempts Used</p><p class="font-semibold">{{ attempts_count|default:0 }}</p></div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><p class="text-slate-500">Attempts Remaining</p><p class="font-semibold">{{ attempts_remaining|default:quiz.max_attempts }}</p></div>
+        </div>
+
+        {% if limit_reached %}
+            <div class="mt-4">
+                {% include 'partials/alert.html' with level='warning' text='Maximum attempts reached for this quiz.' alert_id='quiz-limit' %}
+            </div>
+        {% endif %}
 
         <form method="post" action="{% url 'courses:quiz-submit' quiz.id %}" class="mt-6 space-y-5">
             {% csrf_token %}
             {% for question in quiz.questions.all %}
-                <div class="border rounded-lg p-4">
-                    <p class="font-semibold">{{ forloop.counter }}. {{ question.text }}</p>
-                    <div class="mt-3 space-y-2">
-                        <label><input type="radio" name="question_{{ question.id }}" value="A"> A. {{ question.option_a }}</label>
-                        <label><input type="radio" name="question_{{ question.id }}" value="B"> B. {{ question.option_b }}</label>
-                        <label><input type="radio" name="question_{{ question.id }}" value="C"> C. {{ question.option_c }}</label>
-                        <label><input type="radio" name="question_{{ question.id }}" value="D"> D. {{ question.option_d }}</label>
+                <fieldset class="border border-slate-200 rounded-xl p-4">
+                    <legend class="font-semibold text-unite-navy px-2">{{ forloop.counter }}. {{ question.text }}</legend>
+                    <div class="mt-3 space-y-2 text-sm">
+                        <label class="flex items-start gap-2 p-2 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="question_{{ question.id }}" value="A" class="mt-1"> <span>A. {{ question.option_a }}</span></label>
+                        <label class="flex items-start gap-2 p-2 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="question_{{ question.id }}" value="B" class="mt-1"> <span>B. {{ question.option_b }}</span></label>
+                        <label class="flex items-start gap-2 p-2 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="question_{{ question.id }}" value="C" class="mt-1"> <span>C. {{ question.option_c }}</span></label>
+                        <label class="flex items-start gap-2 p-2 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="radio" name="question_{{ question.id }}" value="D" class="mt-1"> <span>D. {{ question.option_d }}</span></label>
                     </div>
-                </div>
+                </fieldset>
             {% empty %}
-                <div class="text-slate-500">This quiz has no questions yet.</div>
+                <div class="border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-500">This quiz has no questions yet.</div>
             {% endfor %}
+
             {% if quiz.questions.all %}
-                <button type="submit" class="bg-unite-600 text-white px-5 py-2 rounded-lg {% if limit_reached %}opacity-50 cursor-not-allowed{% endif %}" {% if limit_reached %}disabled{% endif %}>Submit Quiz</button>
+                <button type="submit" data-loading="1" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-unite-orange text-white font-semibold hover:opacity-90 disabled:opacity-60" {% if limit_reached %}disabled{% endif %}>
+                    Submit Quiz <i class="fa-solid fa-paper-plane"></i>
+                </button>
             {% endif %}
         </form>
 
-        {% if limit_reached %}
-            <div class="mt-4 p-3 rounded border bg-amber-50 border-amber-200 text-amber-700 text-sm">
-                Maximum attempts reached for this quiz.
-            </div>
-        {% endif %}
-
         {% if latest_attempt %}
-            <div class="mt-8 p-4 rounded-lg border {% if latest_attempt.passed %}bg-emerald-50 border-emerald-200{% else %}bg-rose-50 border-rose-200{% endif %}">
-                <h2 class="font-bold">Latest Attempt</h2>
-                <p>Score: {{ latest_attempt.score }}/{{ latest_attempt.total_questions }} ({{ latest_attempt.percentage }}%)</p>
-                <p>Status: {% if latest_attempt.passed %}<span class="text-emerald-700 font-semibold">Passed</span>{% else %}<span class="text-rose-700 font-semibold">Not Passed</span>{% endif %}</p>
+            <div class="mt-8 p-4 rounded-xl border {% if latest_attempt.passed %}bg-emerald-50 border-emerald-200{% else %}bg-rose-50 border-rose-200{% endif %}">
+                <h2 class="font-semibold text-unite-navy">Latest Attempt</h2>
+                <p class="mt-1 text-sm">Score: {{ latest_attempt.score }}/{{ latest_attempt.total_questions }} ({{ latest_attempt.percentage }}%)</p>
+                <p class="text-sm">Status: {% if latest_attempt.passed %}<span class="text-emerald-700 font-semibold">Passed</span>{% else %}<span class="text-rose-700 font-semibold">Not Passed</span>{% endif %}</p>
                 {% if certificate %}
-                    <a href="{% url 'certificates:detail' certificate.id %}" class="inline-block mt-3 text-unite-700 font-semibold">Open Certificate</a>
+                    <a href="{% url 'certificates:detail' certificate.id %}" class="inline-flex items-center gap-2 mt-3 text-unite-blue font-semibold">Open Certificate <i class="fa-solid fa-certificate"></i></a>
                 {% endif %}
             </div>
         {% endif %}
 
         {% if review_rows %}
             <div class="mt-6">
-                <h2 class="font-bold text-xl">Question Feedback</h2>
+                <h2 class="font-semibold text-xl text-unite-navy">Question Feedback</h2>
                 <div class="mt-3 space-y-3">
                     {% for row in review_rows %}
-                        <div class="border rounded-lg p-4 {% if row.is_correct %}bg-emerald-50 border-emerald-200{% else %}bg-rose-50 border-rose-200{% endif %}">
+                        <div class="border rounded-xl p-4 {% if row.is_correct %}bg-emerald-50 border-emerald-200{% else %}bg-rose-50 border-rose-200{% endif %}">
                             <p class="font-semibold">{{ forloop.counter }}. {{ row.question.text }}</p>
                             <p class="text-sm mt-2">Your answer: <span class="font-semibold">{{ row.selected|default:"No answer" }}</span></p>
                             <p class="text-sm">Correct answer: <span class="font-semibold">{{ row.correct_option }}</span></p>
-                            {% if row.explanation %}<p class="text-sm mt-2"><span class="font-semibold">Explanation:</span> {{ row.explanation }}</p>{% endif %}
+                            {% if row.explanation %}<p class="text-sm mt-2 text-slate-700"><span class="font-semibold">Explanation:</span> {{ row.explanation }}</p>{% endif %}
                         </div>
                     {% endfor %}
                 </div>
             </div>
         {% endif %}
     </div>
-</div>
+</section>
 {% endblock %}

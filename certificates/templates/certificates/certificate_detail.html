@@ -3,13 +3,13 @@
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-10">
     <div class="no-print mb-4 flex gap-3">
-        <button onclick="window.print()" class="bg-unite-600 text-white px-4 py-2 rounded-lg">Print Certificate</button>
+        <button onclick="window.print()" class="bg-unite-orange text-white px-4 py-2 rounded-lg">Print Certificate</button>
         <a href="{% url 'certificates:my-certificates' %}" class="bg-slate-200 px-4 py-2 rounded-lg">Back to Certificates</a>
     </div>
 
-    <div class="bg-white border-4 border-unite-900 rounded-xl p-10 text-center">
+    <div class="bg-white border-4 border-unite-navy rounded-xl p-10 text-center">
         <p class="text-sm tracking-[0.3em] uppercase">Uganda National Institute for Teacher Education</p>
-        <h1 class="text-4xl font-bold mt-3 text-unite-900">Certificate of Completion</h1>
+        <h1 class="text-4xl font-bold mt-3 text-unite-navy">Certificate of Completion</h1>
         <p class="mt-8 text-lg">This certifies that</p>
         <p class="text-3xl font-semibold mt-2">{{ certificate.user.profile.full_name|default:certificate.user.username }}</p>
         <p class="mt-6 text-lg">has successfully completed the training course</p>

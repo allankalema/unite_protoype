@@ -1,22 +1,46 @@
-<nav class="bg-white border-b border-slate-200 no-print">
+{% load static %}
+<nav class="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-40 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-            <a href="{% url 'core:home' %}" class="font-bold text-unite-700 text-lg">UNITE eLearn</a>
-            <div class="flex items-center gap-5 text-sm">
-                <a class="hover:text-unite-700" href="{% url 'courses:list' %}">Courses</a>
-                <a class="hover:text-unite-700" href="{% url 'core:about' %}">About</a>
+        <div class="flex justify-between h-16 items-center gap-5">
+            <a href="{% url 'core:home' %}" class="flex items-center gap-3 min-w-fit">
+                <img src="{% static 'UNITE_Logo.png' %}" alt="UNITE logo" class="h-9 w-9 rounded-lg object-cover border border-slate-200">
+                <div>
+                    <p class="font-bold text-unite-navy leading-tight">UNITE eLearn</p>
+                    <p class="text-xs text-slate-500 leading-tight">Teacher Development Platform</p>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-5 text-sm">
+                <a class="hover:text-unite-blue transition-colors" href="{% url 'core:home' %}">Home</a>
+                <a class="hover:text-unite-blue transition-colors" href="{% url 'courses:list' %}">Courses</a>
+                <a class="hover:text-unite-blue transition-colors" href="{% url 'core:about' %}">About</a>
+                <a class="hover:text-unite-blue transition-colors" href="{% url 'core:about' %}#contact">Contact</a>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3 text-sm">
                 {% if request.user.is_authenticated %}
-                    <a class="hover:text-unite-700" href="{% url 'courses:my-courses' %}">My Courses</a>
-                    <a class="hover:text-unite-700" href="{% url 'ai_tutor:history' %}">AI Tutor</a>
-                    <a class="hover:text-unite-700" href="{% url 'certificates:my-certificates' %}">Certificates</a>
-                    {% if request.user.profile.role == 'staff' %}
-                        <a class="hover:text-unite-700" href="{% url 'dashboard:home' %}">Staff Dashboard</a>
-                    {% endif %}
-                    <a class="hover:text-unite-700" href="{% url 'accounts:profile' %}">Profile</a>
-                    <a class="bg-slate-200 px-3 py-1 rounded-md" href="{% url 'accounts:logout' %}">Logout</a>
+                    <a class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors" href="{% url 'courses:my-courses' %}">
+                        <i class="fa-solid fa-book-open text-unite-blue"></i> My Courses
+                    </a>
+                    <details class="relative">
+                        <summary class="list-none cursor-pointer px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2">
+                            <i class="fa-solid fa-user text-unite-blue"></i>
+                            <span class="hidden sm:inline">{{ request.user.username }}</span>
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-500"></i>
+                        </summary>
+                        <div class="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white shadow-lg p-2">
+                            <a class="block px-3 py-2 rounded-lg hover:bg-slate-100" href="{% url 'accounts:profile' %}">Profile</a>
+                            <a class="block px-3 py-2 rounded-lg hover:bg-slate-100" href="{% url 'ai_tutor:history' %}">AI Tutor History</a>
+                            <a class="block px-3 py-2 rounded-lg hover:bg-slate-100" href="{% url 'certificates:my-certificates' %}">Certificates</a>
+                            {% if request.user.profile.role == 'staff' %}
+                                <a class="block px-3 py-2 rounded-lg hover:bg-slate-100" href="{% url 'dashboard:home' %}">Staff Dashboard</a>
+                            {% endif %}
+                            <a class="block px-3 py-2 rounded-lg text-rose-700 hover:bg-rose-50" href="{% url 'accounts:logout' %}">Logout</a>
+                        </div>
+                    </details>
                 {% else %}
-                    <a class="hover:text-unite-700" href="{% url 'accounts:login' %}">Login</a>
-                    <a class="bg-unite-600 text-white px-3 py-1 rounded-md" href="{% url 'accounts:register' %}">Register</a>
+                    <a class="px-3 py-2 rounded-lg hover:bg-slate-100" href="{% url 'accounts:login' %}">Login</a>
+                    <a class="px-4 py-2 rounded-lg bg-unite-orange text-white hover:opacity-90 transition-opacity" href="{% url 'accounts:register' %}">Register</a>
                 {% endif %}
             </div>
         </div>

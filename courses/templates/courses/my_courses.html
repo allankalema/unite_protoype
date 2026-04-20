@@ -1,27 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}My Courses | UNITE eLearn{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-10">
-    <h1 class="text-3xl font-bold mb-6">My Courses</h1>
+<section class="max-w-7xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-3xl overflow-hidden">
+        <div class="bg-unite-blue-100 p-6 lg:p-8">
+            <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Learner Workspace</p>
+            <h1 class="mt-2 text-3xl lg:text-4xl font-bold text-unite-navy-500">My Courses</h1>
+            <p class="mt-3 text-unite-text-main leading-7 max-w-3xl">Track your enrolled courses, monitor progress, and continue your teacher training from where you left off.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 p-4 lg:p-5">
+            <div class="rounded-xl border border-unite-gray-300 bg-unite-gray-100 p-4">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Enrolled Courses</p>
+                <p class="mt-1 text-2xl font-bold text-unite-navy-500">{{ enrollment_rows|length }}</p>
+            </div>
+            <div class="rounded-xl border border-unite-gray-300 bg-unite-gray-100 p-4">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Learning Status</p>
+                <p class="mt-1 text-2xl font-bold text-unite-navy-500">Keep Going</p>
+            </div>
+        </div>
+    </header>
+
     <div class="space-y-4">
         {% for row in enrollment_rows %}
-            <div class="bg-white border rounded-xl p-5">
-                <div class="flex flex-wrap justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl font-semibold">{{ row.enrollment.course.title }}</h2>
-                        <p class="text-unite-text-main">Enrolled {{ row.enrollment.enrolled_at|date:"M d, Y" }}</p>
+            <article class="bg-white border border-unite-gray-300 rounded-2xl p-5 lg:p-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div class="max-w-3xl">
+                        <div class="flex flex-wrap items-center gap-2 text-xs mb-2">
+                            {% if row.enrollment.course.category %}
+                                <span class="px-2.5 py-1 rounded-full bg-unite-gray-100 border border-unite-gray-300 text-unite-text-main">{{ row.enrollment.course.category }}</span>
+                            {% endif %}
+                            {% if row.enrollment.course.level %}
+                                <span class="px-2.5 py-1 rounded-full bg-unite-orange-100 border border-unite-gray-300 text-unite-orange-600">{{ row.enrollment.course.get_level_display }}</span>
+                            {% endif %}
+                        </div>
+                        <h2 class="text-xl lg:text-2xl font-semibold text-unite-navy-500">{{ row.enrollment.course.title }}</h2>
+                        <p class="mt-1 text-sm text-unite-text-main">Enrolled {{ row.enrollment.enrolled_at|date:"M d, Y" }}</p>
+                        <p class="mt-3 text-sm text-unite-text-main leading-6">{{ row.enrollment.course.short_description|default:row.enrollment.course.description|truncatechars:190 }}</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-sm text-unite-text-main">Progress</p>
-                        <p class="font-bold text-lg">{{ row.progress }}%</p>
+
+                    <div class="w-full sm:w-56 rounded-xl border border-unite-gray-300 bg-unite-gray-100 p-3">
+                        <p class="text-xs uppercase tracking-wide text-unite-text-main">Progress</p>
+                        <p class="mt-1 text-2xl font-bold text-unite-navy-500">{{ row.progress }}%</p>
+                        <div class="mt-2 h-2.5 bg-unite-gray-300 rounded-full overflow-hidden">
+                            <div class="h-2.5 rounded-full bg-unite-orange-500" style="width: {{ row.progress }}%"></div>
+                        </div>
+                        <p class="mt-2 text-xs text-unite-text-main">{% if row.progress >= 100 %}Course completed{% else %}In progress{% endif %}</p>
                     </div>
                 </div>
-                <div class="mt-3 bg-unite-gray-300 rounded-full h-2"><div class="bg-unite-blue-500 h-2 rounded-full" style="width:{{ row.progress }}%"></div></div>
-                <a href="{% url 'courses:learn' row.enrollment.course.slug %}" class="inline-block mt-4 text-unite-blue-500 font-semibold">Open Learning Page</a>
-            </div>
+
+                <div class="mt-5 flex flex-wrap gap-3">
+                    <a href="{% url 'courses:learn' row.enrollment.course.slug %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">
+                        Continue Learning <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="{% url 'courses:detail' row.enrollment.course.slug %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-unite-gray-100 border border-unite-gray-300 text-unite-text-main font-semibold hover:bg-white">
+                        View Course
+                    </a>
+                </div>
+            </article>
         {% empty %}
-            <div class="bg-white border rounded-xl p-6">You have not enrolled in any course yet. <a class="text-unite-blue-500" href="{% url 'courses:list' %}">Browse courses</a>.</div>
+            <div class="bg-white border border-dashed border-unite-gray-300 rounded-2xl p-10 text-center">
+                <i class="fa-regular fa-folder-open text-3xl text-unite-blue-500"></i>
+                <h2 class="mt-3 text-xl font-semibold text-unite-navy-500">No Enrollments Yet</h2>
+                <p class="mt-2 text-unite-text-main">You have not enrolled in any course yet. Start your learning path from the course catalog.</p>
+                <a class="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold" href="{% url 'courses:list' %}">
+                    Browse Courses <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
         {% endfor %}
     </div>
-</div>
+</section>
 {% endblock %}

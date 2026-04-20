@@ -14,4 +14,20 @@
         {% endfor %}
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const alerts = document.querySelectorAll("[id^='alert-']");
+        alerts.forEach(function (alertEl) {
+            setTimeout(function () {
+                if (!alertEl || !alertEl.parentNode) return;
+                alertEl.classList.add("opacity-0", "translate-y-1");
+                setTimeout(function () {
+                    if (alertEl.parentNode) {
+                        alertEl.remove();
+                    }
+                }, 220);
+            }, 7000);
+        });
+    });
+</script>
 {% endif %}

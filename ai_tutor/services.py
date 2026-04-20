@@ -57,10 +57,16 @@ def _call_gemini(prompt):
     if not api_key:
         return None, "missing_api_key"
 
-    endpoint = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-1.5-flash:generateContent?key={api_key}"
-    )
+    primary_model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip() or "gemini-2.5-flash"
+    candidate_models = [
+        primary_model,
+        "gemini-flash-latest",
+        "gemini-2.0-flash",
+    ]
+    unique_models = []
+    for model in candidate_models:
+        if model and model not in unique_models:
+            unique_models.append(model)
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -70,33 +76,48 @@ def _call_gemini(prompt):
         },
     }
 
-    req = request.Request(
-        endpoint,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
+    for model_name in unique_models:
+        endpoint = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model_name}:generateContent?key={api_key}"
+        )
+        req = request.Request(
+            endpoint,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
 
-    try:
-        with request.urlopen(req, timeout=40) as response:
-            response_data = json.loads(response.read().decode("utf-8"))
-            candidates = response_data.get("candidates", [])
-            if not candidates:
-                return None, "empty_candidates"
+        try:
+            with request.urlopen(req, timeout=40) as response:
+                response_data = json.loads(response.read().decode("utf-8"))
+                candidates = response_data.get("candidates", [])
+                if not candidates:
+                    return None, "empty_candidates"
 
-            parts = candidates[0].get("content", {}).get("parts", [])
-            if not parts:
-                return None, "empty_parts"
+                parts = candidates[0].get("content", {}).get("parts", [])
+                if not parts:
+                    return None, "empty_parts"
 
-            text_chunks = [part.get("text", "") for part in parts if part.get("text")]
-            text = "\n".join(text_chunks).strip()
-            if not text:
-                return None, "empty_text"
-            return text, None
-    except error.HTTPError:
-        return None, "http_error"
-    except Exception:
-        return None, "connection_error"
+                text_chunks = [part.get("text", "") for part in parts if part.get("text")]
+                text = "\n".join(text_chunks).strip()
+                if not text:
+                    return None, "empty_text"
+                return text, None
+        except error.HTTPError as exc:
+            status_code = getattr(exc, "code", None)
+            if status_code == 404:
+                continue
+            body = ""
+            try:
+                body = exc.read().decode("utf-8", "ignore")
+            except Exception:
+                body = ""
+            return None, f"http_error_{status_code}:{body[:220]}"
+        except Exception:
+            return None, "connection_error"
+
+    return None, "model_not_found"
 
 
 def generate_ai_response(user_message, course=None, lesson=None, history=None):
@@ -110,10 +131,15 @@ def generate_ai_response(user_message, course=None, lesson=None, history=None):
             "AI tutor is not configured yet. Add GEMINI_API_KEY to your environment to enable live responses. "
             "For now, review the lesson summary and key objectives."
         )
-    if code == "http_error":
+    if code and code.startswith("http_error_"):
         return (
-            "The AI tutor service is temporarily unavailable or the API key is invalid. "
-            "Please verify GEMINI_API_KEY and try again."
+            "The AI tutor request failed. Please verify GEMINI_API_KEY, Gemini API enablement, and quota. "
+            f"Details: {code}"
+        )
+    if code == "model_not_found":
+        return (
+            "Configured Gemini model is not available for generateContent. "
+            "Set GEMINI_MODEL in .env to a supported model such as gemini-2.5-flash."
         )
     if code in {"empty_candidates", "empty_parts", "empty_text"}:
         return "I could not generate a response right now. Please try again shortly."

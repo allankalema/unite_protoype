@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}{{ lesson.title }} | Lesson{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10 space-y-5">
+    <a href="{% url 'courses:learn' course.slug %}" class="text-unite-700 font-semibold">&larr; Back to Course</a>
+    <article class="bg-white border rounded-xl p-6">
+        <h1 class="text-3xl font-bold">{{ lesson.title }}</h1>
+        <p class="text-sm text-slate-600 mt-2">Module {{ lesson.module.order }}: {{ lesson.module.title }}</p>
+
+        {% if lesson.summary %}<div class="mt-5 p-4 bg-sky-50 border border-sky-100 rounded-lg"><p class="font-semibold">Lesson Summary</p><p class="mt-1">{{ lesson.summary }}</p></div>{% endif %}
+
+        <div class="prose max-w-none mt-6 whitespace-pre-line leading-7">{{ lesson.content }}</div>
+
+        <div class="mt-6 flex flex-wrap gap-3 no-print">
+            {% if lesson.video_url %}<a class="px-4 py-2 bg-slate-200 rounded-lg" target="_blank" href="{{ lesson.video_url }}">Watch Video</a>{% endif %}
+            {% if lesson.downloadable_material_url %}<a class="px-4 py-2 bg-slate-200 rounded-lg" target="_blank" href="{{ lesson.downloadable_material_url }}">Download Material</a>{% endif %}
+            <a class="px-4 py-2 bg-unite-600 text-white rounded-lg" href="{% url 'ai_tutor:chat' %}?lesson_id={{ lesson.id }}">Ask AI Tutor</a>
+            {% if not progress_obj.is_completed %}
+                <form method="post" action="{% url 'courses:lesson-complete' lesson.id %}">
+                    {% csrf_token %}
+                    <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg" type="submit">Mark Complete</button>
+                </form>
+            {% else %}
+                <span class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg">Completed</span>
+            {% endif %}
+        </div>
+    </article>
+
+    <div class="flex justify-between no-print">
+        <div>{% if prev_lesson_id %}<a class="text-unite-700" href="{% url 'courses:lesson-detail' prev_lesson_id %}">&larr; Previous Lesson</a>{% endif %}</div>
+        <div>{% if next_lesson_id %}<a class="text-unite-700" href="{% url 'courses:lesson-detail' next_lesson_id %}">Next Lesson &rarr;</a>{% endif %}</div>
+    </div>
+</div>
+{% endblock %}

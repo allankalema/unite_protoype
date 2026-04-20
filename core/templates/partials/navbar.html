@@ -1,0 +1,24 @@
+<nav class="bg-white border-b border-slate-200 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <a href="{% url 'core:home' %}" class="font-bold text-unite-700 text-lg">UNITE eLearn</a>
+            <div class="flex items-center gap-5 text-sm">
+                <a class="hover:text-unite-700" href="{% url 'courses:list' %}">Courses</a>
+                <a class="hover:text-unite-700" href="{% url 'core:about' %}">About</a>
+                {% if request.user.is_authenticated %}
+                    <a class="hover:text-unite-700" href="{% url 'courses:my-courses' %}">My Courses</a>
+                    <a class="hover:text-unite-700" href="{% url 'ai_tutor:history' %}">AI Tutor</a>
+                    <a class="hover:text-unite-700" href="{% url 'certificates:my-certificates' %}">Certificates</a>
+                    {% if request.user.profile.role == 'staff' %}
+                        <a class="hover:text-unite-700" href="{% url 'dashboard:home' %}">Staff Dashboard</a>
+                    {% endif %}
+                    <a class="hover:text-unite-700" href="{% url 'accounts:profile' %}">Profile</a>
+                    <a class="bg-slate-200 px-3 py-1 rounded-md" href="{% url 'accounts:logout' %}">Logout</a>
+                {% else %}
+                    <a class="hover:text-unite-700" href="{% url 'accounts:login' %}">Login</a>
+                    <a class="bg-unite-600 text-white px-3 py-1 rounded-md" href="{% url 'accounts:register' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

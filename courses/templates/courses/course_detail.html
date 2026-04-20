@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }} | Course{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="bg-white border rounded-xl p-6">
+        <h1 class="text-3xl font-bold">{{ course.title }}</h1>
+        <p class="text-slate-600 mt-2">{{ course.short_description }}</p>
+        <p class="mt-5 whitespace-pre-line leading-7">{{ course.description }}</p>
+
+        <div class="mt-6 flex flex-wrap gap-3 items-center text-sm">
+            <span class="px-3 py-1 rounded-full bg-slate-100">Passing score: {{ course.passing_score }}%</span>
+            <span class="px-3 py-1 rounded-full bg-slate-100">Estimated {{ course.estimated_duration_hours }} hours</span>
+        </div>
+
+        <div class="mt-6">
+            {% if request.user.is_authenticated %}
+                {% if is_enrolled %}
+                    <a href="{% url 'courses:learn' course.slug %}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg">Continue Learning</a>
+                {% else %}
+                    <a href="{% url 'courses:enroll' course.slug %}" class="bg-unite-600 text-white px-4 py-2 rounded-lg">Enroll Now</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="bg-unite-600 text-white px-4 py-2 rounded-lg">Login to Enroll</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

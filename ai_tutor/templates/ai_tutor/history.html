@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}AI Chat History{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-6">AI Tutor Sessions</h1>
+    <div class="space-y-3">
+        {% for session in sessions %}
+            <a href="{% url 'ai_tutor:chat' %}?session_id={{ session.id }}" class="block bg-white border rounded-xl p-4 hover:bg-slate-50">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold">{{ session.title|default:'AI Tutor Session' }}</p>
+                        <p class="text-sm text-slate-600">
+                            {% if session.lesson %}Lesson: {{ session.lesson.title }}{% elif session.course %}Course: {{ session.course.title }}{% else %}General{% endif %}
+                        </p>
+                    </div>
+                    <p class="text-sm text-slate-500">{{ session.updated_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </a>
+        {% empty %}
+            <div class="bg-white border rounded-xl p-6 text-slate-600">No chat sessions yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

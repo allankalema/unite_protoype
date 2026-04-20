@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Login | UNITE eLearn{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-12">
+    <div class="bg-white border rounded-xl p-6">
+        <h1 class="text-2xl font-bold mb-1">Welcome Back</h1>
+        <p class="text-slate-600 mb-6">Login to continue your teacher learning journey.</p>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="w-full bg-unite-600 text-white py-2.5 rounded-lg font-semibold" type="submit">Login</button>
+        </form>
+        <p class="mt-4 text-sm">Need an account? <a class="text-unite-700" href="{% url 'accounts:register' %}">Register</a></p>
+    </div>
+</div>
+{% endblock %}

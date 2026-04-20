@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}UNITE eLearn | Teacher Training{% endblock %}
+{% block content %}
+<section class="bg-gradient-to-br from-unite-900 via-unite-700 to-unite-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-20">
+        <h1 class="text-4xl md:text-5xl font-bold max-w-3xl">AI-Enhanced Teacher Training and Certification for UNITE</h1>
+        <p class="mt-5 max-w-2xl text-blue-100">Empower teachers with structured online learning, quizzes, progress tracking, and an AI tutor aligned to course content.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a href="{% url 'accounts:register' %}" class="bg-white text-unite-700 font-semibold px-5 py-3 rounded-lg">Register as Teacher</a>
+            <a href="{% url 'courses:list' %}" class="bg-unite-900/30 border border-white/30 px-5 py-3 rounded-lg">Browse Courses</a>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded-xl border"><h3 class="font-bold text-lg">Structured Learning</h3><p class="mt-2 text-slate-600">Course modules and lesson pathways designed for teacher upskilling.</p></div>
+    <div class="bg-white p-6 rounded-xl border"><h3 class="font-bold text-lg">AI Tutor Support</h3><p class="mt-2 text-slate-600">Ask context-aware questions and receive practical guidance in plain language.</p></div>
+    <div class="bg-white p-6 rounded-xl border"><h3 class="font-bold text-lg">Certification</h3><p class="mt-2 text-slate-600">Earn certificates after completing lessons and passing assessments.</p></div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 pb-14">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Featured Courses</h2>
+        <a href="{% url 'courses:list' %}" class="text-unite-700 font-semibold">View all</a>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+        {% for course in featured_courses %}
+            <article class="bg-white border rounded-xl overflow-hidden">
+                <div class="p-5">
+                    <h3 class="font-bold text-lg">{{ course.title }}</h3>
+                    <p class="text-slate-600 mt-2">{{ course.short_description }}</p>
+                    <a href="{% url 'courses:detail' course.slug %}" class="inline-block mt-4 text-unite-700 font-semibold">Open course</a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="bg-white border rounded-xl p-6 text-slate-600">No featured courses yet. Run seed data to populate demo content.</div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

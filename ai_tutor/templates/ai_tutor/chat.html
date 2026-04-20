@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}AI Tutor{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="bg-white border rounded-xl p-6">
+        <h1 class="text-2xl font-bold">AI Tutor</h1>
+        <p class="text-slate-600 mt-1">
+            {% if lesson %}Lesson context: {{ lesson.title }}{% elif course %}Course context: {{ course.title }}{% else %}General teacher training support{% endif %}
+        </p>
+
+        <div class="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-1">
+            {% for msg in messages_list %}
+                <div class="{% if msg.role == 'user' %}text-right{% endif %}">
+                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-xl {% if msg.role == 'user' %}bg-unite-600 text-white{% else %}bg-slate-100{% endif %}">
+                        <p class="text-xs mb-1 opacity-70 uppercase">{{ msg.role }}</p>
+                        <p class="whitespace-pre-line">{{ msg.message }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-slate-500">No messages yet. Ask your first question about this lesson or course.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" action="{% url 'ai_tutor:send' %}" class="mt-5 space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="session_id" value="{{ session.id }}">
+            {{ chat_form.as_p }}
+            <button type="submit" class="bg-unite-600 text-white px-5 py-2 rounded-lg">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

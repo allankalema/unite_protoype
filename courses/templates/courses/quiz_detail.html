@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{{ quiz.title }} | Quiz{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="bg-white border rounded-xl p-6">
+        <h1 class="text-2xl font-bold">{{ quiz.title }}</h1>
+        <p class="text-slate-600 mt-2">{{ quiz.description }}</p>
+        <p class="mt-2 text-sm">Passing score for this course: <span class="font-semibold">{{ quiz.course.passing_score }}%</span></p>
+
+        <form method="post" action="{% url 'courses:quiz-submit' quiz.id %}" class="mt-6 space-y-5">
+            {% csrf_token %}
+            {% for question in quiz.questions.all %}
+                <div class="border rounded-lg p-4">
+                    <p class="font-semibold">{{ forloop.counter }}. {{ question.text }}</p>
+                    <div class="mt-3 space-y-2">
+                        <label><input type="radio" name="question_{{ question.id }}" value="A"> A. {{ question.option_a }}</label>
+                        <label><input type="radio" name="question_{{ question.id }}" value="B"> B. {{ question.option_b }}</label>
+                        <label><input type="radio" name="question_{{ question.id }}" value="C"> C. {{ question.option_c }}</label>
+                        <label><input type="radio" name="question_{{ question.id }}" value="D"> D. {{ question.option_d }}</label>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-slate-500">This quiz has no questions yet.</div>
+            {% endfor %}
+            {% if quiz.questions.all %}
+                <button type="submit" class="bg-unite-600 text-white px-5 py-2 rounded-lg">Submit Quiz</button>
+            {% endif %}
+        </form>
+
+        {% if latest_attempt %}
+            <div class="mt-8 p-4 rounded-lg border {% if latest_attempt.passed %}bg-emerald-50 border-emerald-200{% else %}bg-rose-50 border-rose-200{% endif %}">
+                <h2 class="font-bold">Latest Attempt</h2>
+                <p>Score: {{ latest_attempt.score }}/{{ latest_attempt.total_questions }} ({{ latest_attempt.percentage }}%)</p>
+                <p>Status: {% if latest_attempt.passed %}<span class="text-emerald-700 font-semibold">Passed</span>{% else %}<span class="text-rose-700 font-semibold">Not Passed</span>{% endif %}</p>
+                {% if certificate %}
+                    <a href="{% url 'certificates:detail' certificate.id %}" class="inline-block mt-3 text-unite-700 font-semibold">Open Certificate</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

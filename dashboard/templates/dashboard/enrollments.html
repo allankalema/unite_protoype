@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Enrollments{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="text-2xl font-bold mb-5">Teacher Enrollments</h1>
+    <div class="bg-white border rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-100"><tr><th class="text-left p-3">Teacher</th><th class="p-3">Course</th><th class="p-3">Completed</th><th class="p-3">Date</th></tr></thead>
+            <tbody>{% for item in enrollments %}<tr class="border-t"><td class="p-3">{{ item.user.profile.full_name|default:item.user.username }}</td><td class="p-3">{{ item.course.title }}</td><td class="p-3">{{ item.is_completed }}</td><td class="p-3">{{ item.enrolled_at|date:"M d, Y" }}</td></tr>{% empty %}<tr><td class="p-3" colspan="4">No enrollments yet.</td></tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

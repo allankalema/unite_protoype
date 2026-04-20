@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Profile | UNITE eLearn{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <div class="bg-white border rounded-xl p-6">
+        <h1 class="text-2xl font-bold">My Profile</h1>
+        <p class="text-slate-600 mt-1">Role: <span class="font-semibold uppercase">{{ profile.role }}</span></p>
+        <form method="post" class="space-y-4 mt-6">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="bg-unite-600 text-white px-5 py-2 rounded-lg" type="submit">Save Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}About | UNITE eLearn{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-14">
+    <h1 class="text-3xl font-bold">Why UNITE eLearn</h1>
+    <p class="mt-4 text-slate-700 leading-7">UNITE eLearn is an AI-enhanced digital learning platform built for teacher professional development. It combines self-paced modules, assessments, and certification with an AI tutor that supports understanding at lesson level.</p>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white p-6 border rounded-xl">
+            <h2 class="font-semibold text-xl">For Teachers</h2>
+            <ul class="mt-3 list-disc ml-6 text-slate-700 space-y-1">
+                <li>Enroll in practical training courses</li>
+                <li>Track progress and complete lesson pathways</li>
+                <li>Take quizzes and unlock certificates</li>
+                <li>Ask AI tutor for simplified explanations</li>
+            </ul>
+        </div>
+        <div class="bg-white p-6 border rounded-xl">
+            <h2 class="font-semibold text-xl">For Staff</h2>
+            <ul class="mt-3 list-disc ml-6 text-slate-700 space-y-1">
+                <li>Create and manage content quickly</li>
+                <li>Monitor enrollments and completions</li>
+                <li>Track AI tutor usage for support insights</li>
+                <li>Present clear demo metrics to stakeholders</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

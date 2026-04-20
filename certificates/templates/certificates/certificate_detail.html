@@ -24,6 +24,11 @@
                 <p class="text-sm text-slate-600">Date Issued</p>
                 <p class="font-semibold">{{ certificate.issued_at|date:"F d, Y" }}</p>
             </div>
+            <div class="col-span-2">
+                <p class="text-sm text-slate-600">Verification Code</p>
+                <p class="font-semibold">{{ certificate.verification_code }}</p>
+                <p class="text-xs text-slate-500 mt-1">Verify: /certificates/verify/{{ certificate.verification_code }}/</p>
+            </div>
         </div>
         <p class="mt-10 text-sm text-slate-500 no-print">PDF download can be added later. Use browser print for this MVP.</p>
     </div>

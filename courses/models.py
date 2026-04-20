@@ -4,10 +4,31 @@ from django.utils.text import slugify
 
 
 class Course(models.Model):
+    LEVEL_BEGINNER = "beginner"
+    LEVEL_INTERMEDIATE = "intermediate"
+    LEVEL_ADVANCED = "advanced"
+    LEVEL_CHOICES = [
+        (LEVEL_BEGINNER, "Beginner"),
+        (LEVEL_INTERMEDIATE, "Intermediate"),
+        (LEVEL_ADVANCED, "Advanced"),
+    ]
+
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255)
+    category = models.CharField(max_length=120, blank=True, db_index=True)
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default=LEVEL_BEGINNER)
     short_description = models.CharField(max_length=300)
     description = models.TextField()
+    learning_objectives = models.TextField(blank=True)
+    prerequisites = models.TextField(blank=True)
+    target_audience = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_courses",
+    )
     cover_image = models.URLField(blank=True)
     is_published = models.BooleanField(default=True)
     passing_score = models.PositiveIntegerField(default=60)
@@ -47,11 +68,24 @@ class Module(models.Model):
 
 
 class Lesson(models.Model):
+    TYPE_VIDEO = "video"
+    TYPE_READING = "reading"
+    TYPE_ASSIGNMENT = "assignment"
+    TYPE_CHOICES = [
+        (TYPE_VIDEO, "Video"),
+        (TYPE_READING, "Reading"),
+        (TYPE_ASSIGNMENT, "Assignment"),
+    ]
+
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=1)
+    lesson_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_READING)
+    duration_minutes = models.PositiveIntegerField(null=True, blank=True)
     content = models.TextField()
     summary = models.TextField(blank=True)
+    ai_summary = models.TextField(blank=True)
+    ai_keywords = models.TextField(blank=True)
     video_url = models.URLField(blank=True)
     downloadable_material_url = models.URLField(blank=True)
 
@@ -95,6 +129,7 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+    max_attempts = models.PositiveIntegerField(default=3)
 
     class Meta:
         ordering = ["course", "id"]
@@ -118,6 +153,7 @@ class Question(models.Model):
     option_c = models.CharField(max_length=255)
     option_d = models.CharField(max_length=255)
     correct_option = models.CharField(max_length=1, choices=OPTION_CHOICES)
+    explanation = models.TextField(blank=True)
 
     def __str__(self):
         return f"Question {self.id} - {self.quiz.title}"
@@ -137,3 +173,28 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.quiz.title} ({self.percentage:.1f}%)"
+
+
+class LessonResource(models.Model):
+    TYPE_PDF = "pdf"
+    TYPE_DOC = "doc"
+    TYPE_LINK = "link"
+    TYPE_VIDEO = "video"
+    TYPE_CHOICES = [
+        (TYPE_PDF, "PDF"),
+        (TYPE_DOC, "Document"),
+        (TYPE_LINK, "Link"),
+        (TYPE_VIDEO, "Video"),
+    ]
+
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="resources")
+    title = models.CharField(max_length=255)
+    file_url = models.URLField()
+    resource_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_LINK)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"{self.lesson.title} - {self.title}"

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Manage Lesson Resources{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-5">
+        <h1 class="text-2xl font-bold">Manage Lesson Resources</h1>
+        <a class="bg-unite-600 text-white px-4 py-2 rounded-lg" href="{% url 'dashboard:create-resource' %}">Add Resource</a>
+    </div>
+    <div class="bg-white border rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-100"><tr><th class="text-left p-3">Title</th><th class="p-3">Type</th><th class="p-3">Lesson</th><th class="p-3">Module</th><th class="p-3">Course</th><th class="p-3">Actions</th></tr></thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr class="border-t">
+                        <td class="p-3"><a class="text-unite-700" target="_blank" href="{{ resource.file_url }}">{{ resource.title }}</a></td>
+                        <td class="p-3 uppercase">{{ resource.resource_type }}</td>
+                        <td class="p-3">{{ resource.lesson.title }}</td>
+                        <td class="p-3">{{ resource.lesson.module.title }}</td>
+                        <td class="p-3">{{ resource.lesson.module.course.title }}</td>
+                        <td class="p-3"><a class="text-unite-700" href="{% url 'dashboard:edit-resource' resource.id %}">Edit</a> | <a class="text-rose-700" href="{% url 'dashboard:delete-resource' resource.id %}">Delete</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td class="p-3" colspan="6">No resources yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

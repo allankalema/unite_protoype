@@ -9,6 +9,7 @@
                 <h2 class="font-bold text-lg">{{ certificate.course.title }}</h2>
                 <p class="text-slate-600 mt-1">Issued {{ certificate.issued_at|date:"M d, Y" }}</p>
                 <p class="text-sm mt-1">Certificate No: {{ certificate.certificate_number }}</p>
+                <p class="text-sm mt-1">Verification: {{ certificate.verification_code }}</p>
                 <a href="{% url 'certificates:detail' certificate.id %}" class="inline-block mt-4 text-unite-700 font-semibold">View Certificate</a>
             </div>
         {% empty %}

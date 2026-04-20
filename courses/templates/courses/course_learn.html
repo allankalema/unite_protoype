@@ -5,10 +5,12 @@
     <div class="bg-white border rounded-xl p-6 mb-6">
         <h1 class="text-3xl font-bold">{{ course.title }}</h1>
         <p class="text-slate-600 mt-2">{{ course.description|truncatechars:220 }}</p>
+        <p class="text-sm text-slate-600 mt-2">Instructor: {{ instructor_name }} ({{ institution_name }})</p>
         <div class="mt-4">
             <p class="text-sm text-slate-600">Overall Progress: <span class="font-semibold">{{ progress }}%</span></p>
             <div class="mt-2 bg-slate-200 rounded-full h-3"><div class="bg-emerald-600 h-3 rounded-full" style="width: {{ progress }}%"></div></div>
             <p class="text-sm text-slate-500 mt-2">{{ completed_lessons }} of {{ total_lessons }} lessons completed</p>
+            <p class="text-sm text-slate-500">Average quiz score: {{ average_score }}%</p>
         </div>
     </div>
 

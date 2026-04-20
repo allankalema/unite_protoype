@@ -18,3 +18,8 @@ def certificate_detail_view(request, certificate_id):
         user=request.user,
     )
     return render(request, "certificates/certificate_detail.html", {"certificate": certificate})
+
+
+def verify_certificate_view(request, code):
+    certificate = Certificate.objects.filter(verification_code=code).select_related("course", "user", "user__profile").first()
+    return render(request, "certificates/verify.html", {"certificate": certificate, "code": code})

@@ -8,6 +8,7 @@ class Certificate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="certificates")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="certificates")
     certificate_number = models.CharField(max_length=100, unique=True)
+    verification_code = models.CharField(max_length=64, unique=True, blank=True, null=True)
     issued_at = models.DateTimeField(auto_now_add=True)
     final_score = models.FloatField(default=0)
 

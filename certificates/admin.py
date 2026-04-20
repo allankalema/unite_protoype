@@ -5,5 +5,5 @@ from .models import Certificate
 
 @admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):
-    list_display = ("certificate_number", "user", "course", "final_score", "issued_at")
-    search_fields = ("certificate_number", "user__username", "course__title")
+    list_display = ("certificate_number", "verification_code", "user", "course", "final_score", "issued_at")
+    search_fields = ("certificate_number", "verification_code", "user__username", "course__title")

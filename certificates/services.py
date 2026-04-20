@@ -1,4 +1,5 @@
 from datetime import datetime
+import secrets
 
 from django.db import IntegrityError
 
@@ -15,6 +16,10 @@ def _generate_certificate_number(sequence):
 def _next_sequence():
     last = Certificate.objects.order_by("-id").first()
     return (last.id + 1) if last else 1
+
+
+def _generate_verification_code():
+    return secrets.token_hex(16).upper()
 
 
 def get_or_create_certificate_if_eligible(user, course):
@@ -41,6 +46,9 @@ def get_or_create_certificate_if_eligible(user, course):
 
     cert = Certificate.objects.filter(user=user, course=course).first()
     if cert:
+        if not cert.verification_code:
+            cert.verification_code = _generate_verification_code()
+            cert.save(update_fields=["verification_code"])
         return cert
 
     sequence = _next_sequence()
@@ -51,12 +59,12 @@ def get_or_create_certificate_if_eligible(user, course):
             user=user,
             course=course,
             certificate_number=cert_number,
+            verification_code=_generate_verification_code(),
             final_score=passed_attempt.percentage,
         )
         enrollment.is_completed = True
         if not enrollment.completed_at:
             enrollment.completed_at = cert.issued_at
-        enrollment.is_completed = True
         enrollment.save(update_fields=["is_completed", "completed_at"])
         return cert
     except IntegrityError:

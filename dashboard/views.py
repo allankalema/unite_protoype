@@ -5,8 +5,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from accounts.decorators import staff_required
 from ai_tutor.models import ChatMessage, ChatSession
 from certificates.models import Certificate
-from courses.forms import CourseForm, LessonForm, ModuleForm, QuestionForm, QuizForm
-from courses.models import Course, Enrollment, Lesson, Module, Question, Quiz
+from courses.forms import CourseForm, LessonForm, LessonResourceForm, ModuleForm, QuestionForm, QuizForm
+from courses.models import Course, Enrollment, Lesson, LessonResource, Module, Question, Quiz
+from courses.services import completion_rate_percentage
 
 
 @staff_required
@@ -16,6 +17,7 @@ def dashboard_home_view(request):
     total_courses = Course.objects.count()
     total_enrollments = Enrollment.objects.count()
     completed_enrollments = Enrollment.objects.filter(is_completed=True).count()
+    completion_rate = completion_rate_percentage()
     certificates_issued = Certificate.objects.count()
     total_ai_sessions = ChatSession.objects.count()
     total_ai_messages = ChatMessage.objects.count()
@@ -26,10 +28,12 @@ def dashboard_home_view(request):
         "total_courses": total_courses,
         "total_enrollments": total_enrollments,
         "completed_enrollments": completed_enrollments,
+        "completion_rate": completion_rate,
         "certificates_issued": certificates_issued,
         "total_ai_sessions": total_ai_sessions,
         "total_ai_messages": total_ai_messages,
         "recent_enrollments": Enrollment.objects.select_related("user", "course")[:8],
+        "recent_completions": Enrollment.objects.filter(is_completed=True).select_related("user", "course")[:8],
         "recent_certificates": Certificate.objects.select_related("user", "course")[:8],
         "recent_sessions": ChatSession.objects.select_related("user", "course", "lesson")[:8],
     }
@@ -124,7 +128,7 @@ def delete_module_view(request, module_id):
 
 @staff_required
 def manage_lessons_view(request):
-    lessons = Lesson.objects.select_related("module", "module__course")
+    lessons = Lesson.objects.select_related("module", "module__course").prefetch_related("resources")
     return render(request, "dashboard/manage_lessons.html", {"lessons": lessons})
 
 
@@ -163,6 +167,49 @@ def delete_lesson_view(request, lesson_id):
         messages.success(request, "Lesson deleted.")
         return redirect("dashboard:manage-lessons")
     return render(request, "dashboard/confirm_delete.html", {"item": lesson, "back_url": "dashboard:manage-lessons"})
+
+
+@staff_required
+def create_lesson_resource_view(request):
+    if request.method == "POST":
+        form = LessonResourceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lesson resource added.")
+            return redirect("dashboard:manage-resources")
+    else:
+        form = LessonResourceForm()
+    return render(request, "dashboard/resource_form.html", {"form": form, "title": "Add Lesson Resource"})
+
+
+@staff_required
+def edit_lesson_resource_view(request, resource_id):
+    resource = get_object_or_404(LessonResource, id=resource_id)
+    if request.method == "POST":
+        form = LessonResourceForm(request.POST, instance=resource)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lesson resource updated.")
+            return redirect("dashboard:manage-resources")
+    else:
+        form = LessonResourceForm(instance=resource)
+    return render(request, "dashboard/resource_form.html", {"form": form, "title": "Edit Lesson Resource"})
+
+
+@staff_required
+def delete_lesson_resource_view(request, resource_id):
+    resource = get_object_or_404(LessonResource, id=resource_id)
+    if request.method == "POST":
+        resource.delete()
+        messages.success(request, "Lesson resource deleted.")
+        return redirect("dashboard:manage-resources")
+    return render(request, "dashboard/confirm_delete.html", {"item": resource, "back_url": "dashboard:manage-resources"})
+
+
+@staff_required
+def manage_resources_view(request):
+    resources = LessonResource.objects.select_related("lesson", "lesson__module", "lesson__module__course")
+    return render(request, "dashboard/manage_resources.html", {"resources": resources})
 
 
 @staff_required

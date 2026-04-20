@@ -10,6 +10,7 @@
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Courses</p><p class="text-2xl font-bold">{{ total_courses }}</p></div>
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Enrollments</p><p class="text-2xl font-bold">{{ total_enrollments }}</p></div>
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Completed Enrollments</p><p class="text-2xl font-bold">{{ completed_enrollments }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Completion Rate</p><p class="text-2xl font-bold">{{ completion_rate }}%</p></div>
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Certificates Issued</p><p class="text-2xl font-bold">{{ certificates_issued }}</p></div>
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">AI Sessions</p><p class="text-2xl font-bold">{{ total_ai_sessions }}</p></div>
         <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">AI Messages</p><p class="text-2xl font-bold">{{ total_ai_messages }}</p></div>
@@ -19,15 +20,20 @@
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-courses' %}">Manage Courses</a>
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-modules' %}">Manage Modules</a>
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-lessons' %}">Manage Lessons</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-resources' %}">Manage Lesson Resources</a>
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-quizzes' %}">Manage Quizzes & Questions</a>
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:enrollments' %}">View Enrollments</a>
         <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:ai-logs' %}">View AI Logs</a>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-6 mt-10">
+    <div class="grid lg:grid-cols-4 gap-6 mt-10">
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent Enrollments</h2>
             {% for item in recent_enrollments %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-slate-500">No enrollments yet.</p>{% endfor %}
+        </div>
+        <div class="bg-white border rounded-xl p-4">
+            <h2 class="font-bold mb-3">Recent Completions</h2>
+            {% for item in recent_completions %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-slate-500">No completions yet.</p>{% endfor %}
         </div>
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent Certificates</h2>

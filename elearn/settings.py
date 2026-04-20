@@ -1,7 +1,3 @@
-"""
-Django settings for elearn project.
-"""
-
 import os
 from pathlib import Path
 

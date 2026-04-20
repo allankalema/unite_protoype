@@ -1,5 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -63,7 +65,19 @@ def _get_or_create_lesson_session(user, course, lesson):
 
 
 def course_list_view(request):
+    search_query = (request.GET.get("q") or "").strip()
     courses = Course.objects.filter(is_published=True).select_related("created_by", "created_by__profile")
+    if search_query:
+        courses = courses.filter(
+            Q(title__icontains=search_query)
+            | Q(short_description__icontains=search_query)
+            | Q(category__icontains=search_query)
+            | Q(created_by__username__icontains=search_query)
+            | Q(created_by__profile__full_name__icontains=search_query)
+            | Q(created_by__profile__institution_name__icontains=search_query)
+        )
+
+    courses = courses.order_by("-id")
     enrolled_course_ids = set()
     if request.user.is_authenticated:
         enrolled_course_ids = set(
@@ -81,10 +95,18 @@ def course_list_view(request):
             }
         )
 
+    paginator = Paginator(course_rows, 9)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
     return render(
         request,
         "courses/course_list.html",
-        {"course_rows": course_rows, "enrolled_course_ids": enrolled_course_ids},
+        {
+            "course_rows": page_obj.object_list,
+            "enrolled_course_ids": enrolled_course_ids,
+            "page_obj": page_obj,
+            "search_query": search_query,
+        },
     )
 
 

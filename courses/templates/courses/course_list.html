@@ -14,10 +14,25 @@
         {% endif %}
     </header>
 
+    <form method="get" class="mb-6 rounded-2xl border border-unite-gray-300 bg-white p-3">
+        <div class="relative">
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Search by title, category, instructor, or institution..."
+                class="w-full rounded-xl border border-unite-gray-300 bg-white px-4 pr-11 py-3 text-sm text-unite-text-main focus:outline-none focus:ring-2 focus:ring-unite-blue-500"
+            >
+            <button type="submit" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-unite-blue-500 hover:bg-unite-blue-600 text-white transition-colors">
+                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </button>
+        </div>
+    </form>
+
     <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {% for row in course_rows %}
             {% with course=row.course %}
-                <article class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                <article class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
                     {% if course.cover_image %}
                         <img src="{{ course.cover_image }}" alt="{{ course.title }}" class="h-44 w-full object-cover">
                     {% else %}
@@ -41,10 +56,10 @@
                         <h2 class="text-lg font-semibold mt-4">{{ course.title }}</h2>
                         <p class="text-sm text-unite-text-main mt-2 line-clamp-3">{{ course.short_description }}</p>
 
-                        <div class="mt-4 space-y-1.5 text-xs text-unite-text-main">
-                            <p class="flex items-center gap-2"><i class="fa-regular fa-clock text-unite-blue-500"></i>{{ course.estimated_duration_hours }} hours</p>
-                            <p class="flex items-center gap-2"><i class="fa-solid fa-user text-unite-blue-500"></i>{{ row.instructor_name }}</p>
-                            <p class="flex items-center gap-2"><i class="fa-solid fa-building-columns text-unite-blue-500"></i>{{ row.institution_name }}</p>
+                        <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-unite-text-main">
+                            <p class="inline-flex items-center gap-1.5"><i class="fa-regular fa-clock text-unite-blue-500"></i>{{ course.estimated_duration_hours }} hours</p>
+                            <p class="inline-flex items-center gap-1.5"><i class="fa-solid fa-user text-unite-blue-500"></i>{{ row.instructor_name }}</p>
+                            <p class="inline-flex items-center gap-1.5"><i class="fa-solid fa-building-columns text-unite-blue-500"></i>{{ row.institution_name }}</p>
                         </div>
 
                         <a href="{% url 'courses:detail' course.slug %}" class="inline-flex items-center justify-center gap-2 mt-5 px-4 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold  transition-opacity">
@@ -61,5 +76,33 @@
             </div>
         {% endfor %}
     </div>
+
+    {% if page_obj and page_obj.paginator.num_pages > 1 %}
+        <nav class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Course pagination">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ search_query|urlencode }}&page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-xl border border-unite-gray-300 bg-white text-sm font-semibold text-unite-navy-500 hover:bg-unite-gray-100">
+                    Previous
+                </a>
+            {% else %}
+                <span class="px-3 py-2 rounded-xl border border-unite-gray-300 bg-unite-gray-100 text-sm font-semibold text-unite-text-main opacity-70">Previous</span>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="px-3 py-2 rounded-xl bg-unite-orange-500 text-white text-sm font-semibold">{{ num }}</span>
+                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    <a href="?q={{ search_query|urlencode }}&page={{ num }}" class="px-3 py-2 rounded-xl border border-unite-gray-300 bg-white text-sm font-semibold text-unite-navy-500 hover:bg-unite-gray-100">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ search_query|urlencode }}&page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-xl border border-unite-gray-300 bg-white text-sm font-semibold text-unite-navy-500 hover:bg-unite-gray-100">
+                    Next
+                </a>
+            {% else %}
+                <span class="px-3 py-2 rounded-xl border border-unite-gray-300 bg-unite-gray-100 text-sm font-semibold text-unite-text-main opacity-70">Next</span>
+            {% endif %}
+        </nav>
+    {% endif %}
 </section>
 {% endblock %}

@@ -17,6 +17,28 @@
         padding: 0.1rem 0.3rem;
         background: #F5F5F5;
     }
+    #chat-input {
+        min-height: 56px;
+        max-height: 180px;
+        line-height: 1.45;
+        font-size: 0.92rem;
+        border-radius: 0.75rem;
+        border: 1px solid #DDDDDD;
+        padding: 0.65rem 0.8rem;
+        color: #333333;
+    }
+    #chat-input::placeholder {
+        color: #333333;
+        opacity: 0.65;
+    }
+    #chat-panel.is-maximized {
+        inset: 1rem;
+        width: auto;
+        max-width: none;
+        height: auto;
+        max-height: none;
+        border-radius: 1rem;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -133,13 +155,20 @@
     <i class="fa-solid fa-robot text-xl"></i>
 </button>
 
-<section id="chat-panel" class="fixed bottom-5 right-5 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-[min(78vh,560px)] bg-white border border-unite-gray-300 rounded-2xl shadow-2xl no-print hidden flex flex-col translate-y-6 opacity-0 transition-all duration-300">
+<section id="chat-panel" class="fixed bottom-5 right-5 z-50 w-[420px] max-w-[calc(100vw-1.5rem)] h-[min(86vh,720px)] bg-white border border-unite-gray-300 rounded-2xl shadow-2xl no-print hidden flex flex-col translate-y-6 opacity-0 transition-all duration-300">
     <header class="px-4 py-3 border-b border-unite-gray-300 flex justify-between items-center bg-unite-gray-100 rounded-t-2xl">
         <div>
             <h3 class="font-semibold text-unite-navy-500">AI Tutor</h3>
             <p class="text-xs text-unite-text-main">Lesson context: {{ lesson.title }}</p>
         </div>
-        <button type="button" id="chat-close" class="h-9 w-9 rounded-lg hover:bg-unite-gray-100"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex items-center gap-1">
+            <button type="button" id="chat-max" class="h-9 w-9 rounded-lg hover:bg-unite-gray-100" title="Maximize">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+            <button type="button" id="chat-close" class="h-9 w-9 rounded-lg hover:bg-unite-gray-100" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
     </header>
 
     <div id="chat-messages" class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 space-y-3 bg-white">
@@ -165,11 +194,12 @@
         {% csrf_token %}
         <input type="hidden" name="session_id" value="{{ chat_session.id }}">
         <div class="flex items-end gap-2">
-            <textarea name="message" id="chat-input" rows="2" maxlength="2000" class="resize-none" placeholder="Ask AI tutor about this lesson..."></textarea>
-            <button id="chat-send" type="submit" class="h-11 w-11 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white ">
+            <textarea name="message" id="chat-input" rows="2" maxlength="2000" class="resize-y flex-1" placeholder="Ask about this lesson, examples, or classroom application..."></textarea>
+            <button id="chat-send" type="submit" class="h-11 w-11 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white shrink-0">
                 <i class="fa-solid fa-paper-plane"></i>
             </button>
         </div>
+        <p class="text-[11px] text-unite-text-main mt-2">Press <span class="font-semibold">Enter</span> to send. Press <span class="font-semibold">Ctrl+Enter</span> for a new line.</p>
     </form>
 </section>
 {% endblock %}
@@ -185,12 +215,14 @@
         }, 280);
 
         const toggleButton = document.getElementById("chat-toggle");
+        const maxButton = document.getElementById("chat-max");
         const closeButton = document.getElementById("chat-close");
         const panel = document.getElementById("chat-panel");
         const messagesWrap = document.getElementById("chat-messages");
         const form = document.getElementById("chat-form");
         const input = document.getElementById("chat-input");
         const loading = document.getElementById("chat-loading");
+        let isMaximized = false;
 
         function openPanel() {
             panel.classList.remove("hidden");
@@ -211,27 +243,88 @@
             }, 220);
         }
 
-        function appendMessage(text, fromUser) {
+        function normalizeAIText(text) {
+            return (text || "")
+                .replace(/\\u0027/g, "'")
+                .replace(/\\u2019/g, "’")
+                .replace(/\\u2018/g, "‘");
+        }
+
+        async function typewriterMarkdown(targetNode, rawText) {
+            const text = normalizeAIText(rawText);
+            const pace = 12;
+            targetNode.textContent = "";
+            for (let i = 0; i < text.length; i++) {
+                targetNode.textContent += text[i];
+                if (i % 3 === 0) {
+                    messagesWrap.scrollTop = messagesWrap.scrollHeight;
+                    await new Promise((resolve) => setTimeout(resolve, pace));
+                }
+            }
+            const html = marked.parse(text);
+            targetNode.innerHTML = DOMPurify.sanitize(html);
+            messagesWrap.scrollTop = messagesWrap.scrollHeight;
+        }
+
+        function attachCopyButton(row, contentNode) {
+            const copyWrap = document.createElement("div");
+            copyWrap.className = "mt-2 text-right";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "text-[11px] px-2 py-1 rounded-md border border-unite-gray-300 text-unite-blue-500 hover:bg-unite-gray-100";
+            btn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i>Copy';
+            btn.addEventListener("click", async function () {
+                const interpreted = (contentNode.innerText || "").trim();
+                if (!interpreted) return;
+                try {
+                    await navigator.clipboard.writeText(interpreted);
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Copied';
+                    setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i>Copy'; }, 1200);
+                } catch (err) {
+                    btn.innerHTML = 'Copy failed';
+                    setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i>Copy'; }, 1200);
+                }
+            });
+            copyWrap.appendChild(btn);
+            row.appendChild(copyWrap);
+        }
+
+        function appendMessage(text, fromUser, options = {}) {
             const row = document.createElement("div");
             if (fromUser) row.className = "text-right";
             const bubble = document.createElement("div");
             bubble.className = "inline-block max-w-[85%] px-3 py-2 rounded-xl text-sm " + (fromUser ? "bg-unite-blue-500 text-white" : "bg-unite-gray-100 text-unite-text-main");
             const content = document.createElement("div");
             content.className = "ai-md";
-            const html = marked.parse(text || "");
+            const normalized = normalizeAIText(text);
+            const html = marked.parse(normalized);
             content.innerHTML = DOMPurify.sanitize(html);
             bubble.appendChild(content);
             row.appendChild(bubble);
+            if (!fromUser) {
+                attachCopyButton(row, content);
+            }
             messagesWrap.appendChild(row);
             messagesWrap.scrollTop = messagesWrap.scrollHeight;
+            if (!fromUser && options.typewriter) {
+                typewriterMarkdown(content, normalized);
+            }
         }
 
         function renderExistingMarkdown() {
-            const blocks = messagesWrap.querySelectorAll("[data-md]");
-            blocks.forEach(function (block) {
+            const bubbles = messagesWrap.querySelectorAll("[data-md]");
+            bubbles.forEach(function (block) {
                 const raw = block.getAttribute("data-md") || "";
-                const html = marked.parse(raw);
+                const html = marked.parse(normalizeAIText(raw));
                 block.innerHTML = DOMPurify.sanitize(html);
+                const row = block.closest("div.text-right, div:not(.text-right)");
+                const bubble = block.closest(".inline-block");
+                if (bubble && !bubble.classList.contains("bg-unite-blue-500")) {
+                    const wrap = bubble.parentElement;
+                    if (wrap && !wrap.querySelector("button")) {
+                        attachCopyButton(wrap, block);
+                    }
+                }
                 block.removeAttribute("data-md");
             });
             messagesWrap.scrollTop = messagesWrap.scrollHeight;
@@ -239,7 +332,35 @@
 
         toggleButton.addEventListener("click", openPanel);
         closeButton.addEventListener("click", closePanel);
+        maxButton.addEventListener("click", function () {
+            isMaximized = !isMaximized;
+            panel.classList.toggle("is-maximized", isMaximized);
+            const icon = maxButton.querySelector("i");
+            if (icon) {
+                icon.className = isMaximized ? "fa-solid fa-compress" : "fa-solid fa-expand";
+            }
+            setTimeout(() => { messagesWrap.scrollTop = messagesWrap.scrollHeight; }, 40);
+        });
         renderExistingMarkdown();
+
+        input.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter") return;
+
+            // Ctrl/Cmd + Enter inserts a newline at cursor position.
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const original = input.value;
+                input.value = original.slice(0, start) + "\n" + original.slice(end);
+                input.selectionStart = input.selectionEnd = start + 1;
+                return;
+            }
+
+            // Plain Enter sends message.
+            event.preventDefault();
+            form.requestSubmit();
+        });
 
         form.addEventListener("submit", async function (event) {
             event.preventDefault();
@@ -259,12 +380,12 @@
                 });
                 const data = await response.json();
                 if (!response.ok) {
-                    appendMessage(data.error || "Unable to fetch response.", false);
+                    appendMessage(data.error || "Unable to fetch response.", false, { typewriter: true });
                 } else {
-                    appendMessage(data.assistant_message || "No response generated.", false);
+                    appendMessage(data.assistant_message || "No response generated.", false, { typewriter: true });
                 }
             } catch (error) {
-                appendMessage("Network issue. Please try again.", false);
+                appendMessage("Network issue. Please try again.", false, { typewriter: true });
             } finally {
                 loading.classList.add("hidden");
             }

@@ -11,6 +11,13 @@ from .models import ChatMessage, ChatSession
 from .services import generate_ai_response
 
 
+def _teacher_name(user):
+    profile = getattr(user, "profile", None)
+    if profile and profile.full_name:
+        return profile.full_name.split()[0]
+    return user.username
+
+
 def _get_or_create_session(user, course=None, lesson=None, session_id=None):
     if session_id:
         return get_object_or_404(ChatSession, id=session_id, user=user)
@@ -88,6 +95,7 @@ def ai_send_message_view(request):
         course=session.course,
         lesson=session.lesson,
         history=history,
+        teacher_name=_teacher_name(request.user),
     )
     ai_msg = ChatMessage.objects.create(
         session=session,

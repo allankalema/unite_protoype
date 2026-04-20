@@ -3,7 +3,7 @@ import os
 from urllib import error, request
 
 
-def _build_prompt(user_message, course=None, lesson=None, history=None):
+def _build_prompt(user_message, course=None, lesson=None, history=None, teacher_name="Teacher"):
     history = history or []
     course_title = course.title if course else "General teacher development"
     learning_objectives = course.learning_objectives if course else ""
@@ -49,6 +49,10 @@ Conversation history:
 
 Teacher question:
 {user_message}
+
+Important style:
+- Address the teacher naturally by name when appropriate: {teacher_name}.
+- Use normal apostrophes in contractions (e.g., I'm, don't). Do not use escaped forms like \\u0027.
 """.strip()
 
 
@@ -120,8 +124,14 @@ def _call_gemini(prompt):
     return None, "model_not_found"
 
 
-def generate_ai_response(user_message, course=None, lesson=None, history=None):
-    prompt = _build_prompt(user_message, course=course, lesson=lesson, history=history)
+def generate_ai_response(user_message, course=None, lesson=None, history=None, teacher_name="Teacher"):
+    prompt = _build_prompt(
+        user_message,
+        course=course,
+        lesson=lesson,
+        history=history,
+        teacher_name=teacher_name,
+    )
     result, code = _call_gemini(prompt)
     if result:
         return result

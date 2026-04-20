@@ -10,6 +10,118 @@ from courses.forms import CourseForm, LessonForm, LessonResourceForm, ModuleForm
 from courses.models import Course, Enrollment, Lesson, LessonResource, Module, Question, Quiz
 from courses.services import completion_rate_percentage
 
+COURSE_WIZARD_STEPS = [
+    {
+        "title": "Core Details",
+        "description": "Define the core course identity and academic positioning.",
+        "fields": ["title", "slug", "category", "level", "created_by", "is_published"],
+    },
+    {
+        "title": "Learning Content",
+        "description": "Provide learner-facing descriptions and outcomes.",
+        "fields": ["short_description", "description", "learning_objectives", "prerequisites", "target_audience"],
+    },
+    {
+        "title": "Delivery Settings",
+        "description": "Configure assessment and delivery settings.",
+        "fields": ["cover_image", "passing_score", "estimated_duration_hours"],
+    },
+]
+
+MODULE_WIZARD_STEPS = [
+    {
+        "title": "Module Basics",
+        "description": "Select course and define module position.",
+        "fields": ["course", "title", "order"],
+    },
+    {
+        "title": "Module Description",
+        "description": "Add extra context for instructors and learners.",
+        "fields": ["description"],
+    },
+]
+
+LESSON_WIZARD_STEPS = [
+    {
+        "title": "Lesson Setup",
+        "description": "Attach lesson to module and define lesson metadata.",
+        "fields": ["module", "title", "order", "lesson_type", "duration_minutes"],
+    },
+    {
+        "title": "Learning Content",
+        "description": "Add main lesson content and supporting summaries.",
+        "fields": ["content", "summary", "ai_summary", "ai_keywords"],
+    },
+    {
+        "title": "Media and Downloads",
+        "description": "Attach optional external video or downloadable links.",
+        "fields": ["video_url", "downloadable_material_url"],
+    },
+]
+
+RESOURCE_WIZARD_STEPS = [
+    {
+        "title": "Resource Identity",
+        "description": "Define what this resource is and where it belongs.",
+        "fields": ["lesson", "title", "resource_type"],
+    },
+    {
+        "title": "Resource Link",
+        "description": "Add the file URL or external link.",
+        "fields": ["file_url"],
+    },
+]
+
+QUIZ_WIZARD_STEPS = [
+    {
+        "title": "Quiz Basics",
+        "description": "Define quiz title and course association.",
+        "fields": ["course", "title"],
+    },
+    {
+        "title": "Quiz Rules",
+        "description": "Set attempts and activation behavior.",
+        "fields": ["description", "is_active", "max_attempts"],
+    },
+]
+
+QUESTION_WIZARD_STEPS = [
+    {
+        "title": "Question Prompt",
+        "description": "Define the quiz and question statement.",
+        "fields": ["quiz", "text"],
+    },
+    {
+        "title": "Answer Options",
+        "description": "Provide all options and select the correct one.",
+        "fields": ["option_a", "option_b", "option_c", "option_d", "correct_option"],
+    },
+    {
+        "title": "Explanation",
+        "description": "Optional pedagogical explanation for answer review.",
+        "fields": ["explanation"],
+    },
+]
+
+
+def _render_wizard_form(request, form, title, wizard_steps, back_url_name):
+    return render(
+        request,
+        "dashboard/form_wizard.html",
+        {
+            "form": form,
+            "title": title,
+            "wizard_steps": wizard_steps,
+            "back_url_name": back_url_name,
+        },
+    )
+
+
+def _apply_course_creator_permissions(form, user):
+    if user.is_superuser:
+        return
+    form.fields.pop("created_by", None)
+
 
 @staff_required
 def dashboard_home_view(request):
@@ -60,13 +172,18 @@ def course_detail_admin_view(request, course_id):
 def create_course_view(request):
     if request.method == "POST":
         form = CourseForm(request.POST)
+        _apply_course_creator_permissions(form, request.user)
         if form.is_valid():
-            form.save()
+            course = form.save(commit=False)
+            if not course.created_by_id:
+                course.created_by = request.user
+            course.save()
             messages.success(request, "Course created successfully.")
             return redirect("dashboard:manage-courses")
     else:
-        form = CourseForm()
-    return render(request, "dashboard/course_form.html", {"form": form, "title": "Create Course"})
+        form = CourseForm(initial={"created_by": request.user.id})
+        _apply_course_creator_permissions(form, request.user)
+    return _render_wizard_form(request, form, "Create Course", COURSE_WIZARD_STEPS, "dashboard:manage-courses")
 
 
 @staff_required
@@ -74,13 +191,15 @@ def edit_course_view(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     if request.method == "POST":
         form = CourseForm(request.POST, instance=course)
+        _apply_course_creator_permissions(form, request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Course updated successfully.")
             return redirect("dashboard:manage-courses")
     else:
         form = CourseForm(instance=course)
-    return render(request, "dashboard/course_form.html", {"form": form, "title": "Edit Course"})
+        _apply_course_creator_permissions(form, request.user)
+    return _render_wizard_form(request, form, "Edit Course", COURSE_WIZARD_STEPS, "dashboard:manage-courses")
 
 
 @staff_required
@@ -118,7 +237,7 @@ def create_module_view(request):
             return redirect("dashboard:manage-modules")
     else:
         form = ModuleForm()
-    return render(request, "dashboard/module_form.html", {"form": form, "title": "Create Module"})
+    return _render_wizard_form(request, form, "Create Module", MODULE_WIZARD_STEPS, "dashboard:manage-modules")
 
 
 @staff_required
@@ -132,7 +251,7 @@ def edit_module_view(request, module_id):
             return redirect("dashboard:manage-modules")
     else:
         form = ModuleForm(instance=module)
-    return render(request, "dashboard/module_form.html", {"form": form, "title": "Edit Module"})
+    return _render_wizard_form(request, form, "Edit Module", MODULE_WIZARD_STEPS, "dashboard:manage-modules")
 
 
 @staff_required
@@ -170,7 +289,7 @@ def create_lesson_view(request):
             return redirect("dashboard:manage-lessons")
     else:
         form = LessonForm()
-    return render(request, "dashboard/lesson_form.html", {"form": form, "title": "Create Lesson"})
+    return _render_wizard_form(request, form, "Create Lesson", LESSON_WIZARD_STEPS, "dashboard:manage-lessons")
 
 
 @staff_required
@@ -184,7 +303,7 @@ def edit_lesson_view(request, lesson_id):
             return redirect("dashboard:manage-lessons")
     else:
         form = LessonForm(instance=lesson)
-    return render(request, "dashboard/lesson_form.html", {"form": form, "title": "Edit Lesson"})
+    return _render_wizard_form(request, form, "Edit Lesson", LESSON_WIZARD_STEPS, "dashboard:manage-lessons")
 
 
 @staff_required
@@ -207,7 +326,13 @@ def create_lesson_resource_view(request):
             return redirect("dashboard:manage-resources")
     else:
         form = LessonResourceForm()
-    return render(request, "dashboard/resource_form.html", {"form": form, "title": "Add Lesson Resource"})
+    return _render_wizard_form(
+        request,
+        form,
+        "Add Lesson Resource",
+        RESOURCE_WIZARD_STEPS,
+        "dashboard:manage-resources",
+    )
 
 
 @staff_required
@@ -221,7 +346,13 @@ def edit_lesson_resource_view(request, resource_id):
             return redirect("dashboard:manage-resources")
     else:
         form = LessonResourceForm(instance=resource)
-    return render(request, "dashboard/resource_form.html", {"form": form, "title": "Edit Lesson Resource"})
+    return _render_wizard_form(
+        request,
+        form,
+        "Edit Lesson Resource",
+        RESOURCE_WIZARD_STEPS,
+        "dashboard:manage-resources",
+    )
 
 
 @staff_required
@@ -265,7 +396,7 @@ def create_quiz_view(request):
             return redirect("dashboard:manage-quizzes")
     else:
         form = QuizForm()
-    return render(request, "dashboard/quiz_form.html", {"form": form, "title": "Create Quiz"})
+    return _render_wizard_form(request, form, "Create Quiz", QUIZ_WIZARD_STEPS, "dashboard:manage-quizzes")
 
 
 @staff_required
@@ -279,7 +410,7 @@ def edit_quiz_view(request, quiz_id):
             return redirect("dashboard:manage-quizzes")
     else:
         form = QuizForm(instance=quiz)
-    return render(request, "dashboard/quiz_form.html", {"form": form, "title": "Edit Quiz"})
+    return _render_wizard_form(request, form, "Edit Quiz", QUIZ_WIZARD_STEPS, "dashboard:manage-quizzes")
 
 
 @staff_required
@@ -303,7 +434,13 @@ def create_question_view(request, quiz_id):
             return redirect("dashboard:manage-quizzes")
     else:
         form = QuestionForm(initial={"quiz": quiz})
-    return render(request, "dashboard/question_form.html", {"form": form, "title": f"Add Question: {quiz.title}"})
+    return _render_wizard_form(
+        request,
+        form,
+        f"Add Question: {quiz.title}",
+        QUESTION_WIZARD_STEPS,
+        "dashboard:manage-quizzes",
+    )
 
 
 @staff_required
@@ -317,7 +454,7 @@ def edit_question_view(request, question_id):
             return redirect("dashboard:manage-quizzes")
     else:
         form = QuestionForm(instance=question)
-    return render(request, "dashboard/question_form.html", {"form": form, "title": "Edit Question"})
+    return _render_wizard_form(request, form, "Edit Question", QUESTION_WIZARD_STEPS, "dashboard:manage-quizzes")
 
 
 @staff_required

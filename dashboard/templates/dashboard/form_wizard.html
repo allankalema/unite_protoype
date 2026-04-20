@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="max-w-4xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Guided Form</p>
+        <h1 class="mt-1 text-2xl lg:text-3xl font-bold text-unite-navy-500">{{ title }}</h1>
+        <p class="mt-2 text-sm text-unite-text-main">Complete one section at a time. Your draft is saved automatically on this browser.</p>
+
+        <div class="mt-4 flex flex-wrap gap-2 text-xs" id="wizard-step-chips">
+            {% for step in wizard_steps %}
+                <button type="button" class="wizard-chip px-2.5 py-1 rounded-full border border-unite-gray-300 bg-unite-gray-100 text-unite-text-main" data-step-chip="{{ forloop.counter0 }}">
+                    {{ forloop.counter }}. {{ step.title }}
+                </button>
+            {% endfor %}
+        </div>
+        <p id="draft-status" class="mt-3 text-xs text-unite-text-main">Draft status: Ready</p>
+    </header>
+
+    <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <form method="post" class="space-y-5" id="wizard-form">
+            {% csrf_token %}
+            {% for step in wizard_steps %}
+                <section class="wizard-step space-y-4 {% if not forloop.first %}hidden{% endif %}" data-step-index="{{ forloop.counter0 }}">
+                    <div class="border-b border-unite-gray-300 pb-3">
+                        <h2 class="text-xl font-semibold text-unite-navy-500">{{ step.title }}</h2>
+                        <p class="text-sm text-unite-text-main mt-1">{{ step.description }}</p>
+                    </div>
+                    <div class="space-y-4">
+                        {% for field in form %}
+                            {% if field.name in step.fields %}
+                                <div class="wizard-field" data-field-name="{{ field.name }}">
+                                    {% include 'partials/form_field.html' with field=field %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+
+            <div class="border-t border-unite-gray-300 pt-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex gap-2">
+                    <button type="button" id="wizard-prev" class="px-4 py-2.5 rounded-xl bg-unite-gray-300 text-unite-text-main font-semibold">Previous</button>
+                    <button type="button" id="wizard-next" class="px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Next</button>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="button" id="wizard-save-draft" class="px-4 py-2.5 rounded-xl bg-unite-gray-100 border border-unite-gray-300 text-unite-text-main font-semibold">Save Draft</button>
+                    <button class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold" type="submit" data-loading="1" id="wizard-submit">
+                        Save Changes
+                    </button>
+                    <a class="bg-unite-gray-300 hover:bg-unite-gray-100 text-unite-text-main px-5 py-2.5 rounded-xl font-semibold" href="{% url back_url_name %}">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const form = document.getElementById("wizard-form");
+        if (!form) return;
+
+        const stepSections = Array.from(document.querySelectorAll(".wizard-step"));
+        const stepChips = Array.from(document.querySelectorAll(".wizard-chip"));
+        const prevButton = document.getElementById("wizard-prev");
+        const nextButton = document.getElementById("wizard-next");
+        const saveDraftButton = document.getElementById("wizard-save-draft");
+        const submitButton = document.getElementById("wizard-submit");
+        const draftStatus = document.getElementById("draft-status");
+        const draftKey = "wizardDraft:v1:user{{ request.user.id }}:" + window.location.pathname;
+        let currentStep = 0;
+
+        function getStepFields(stepEl) {
+            const fields = stepEl.querySelectorAll("input, textarea, select");
+            return Array.from(fields).filter(function (el) {
+                return el.name && el.type !== "hidden" && !el.disabled;
+            });
+        }
+
+        function saveDraft() {
+            const payload = {};
+            const inputs = form.querySelectorAll("input, textarea, select");
+            inputs.forEach(function (el) {
+                if (!el.name || el.type === "hidden" || el.disabled) return;
+                if (el.type === "checkbox") {
+                    payload[el.name] = el.checked;
+                } else {
+                    payload[el.name] = el.value;
+                }
+            });
+            payload.__step = currentStep;
+            payload.__saved_at = new Date().toISOString();
+            localStorage.setItem(draftKey, JSON.stringify(payload));
+            if (draftStatus) {
+                draftStatus.textContent = "Draft status: Saved at " + new Date().toLocaleTimeString();
+            }
+        }
+
+        function restoreDraft() {
+            const raw = localStorage.getItem(draftKey);
+            if (!raw) return;
+            try {
+                const payload = JSON.parse(raw);
+                const inputs = form.querySelectorAll("input, textarea, select");
+                inputs.forEach(function (el) {
+                    if (!el.name || !(el.name in payload) || el.type === "hidden" || el.disabled) return;
+                    if (el.type === "checkbox") {
+                        el.checked = !!payload[el.name];
+                    } else {
+                        el.value = payload[el.name];
+                    }
+                });
+                if (typeof payload.__step === "number") {
+                    currentStep = Math.max(0, Math.min(stepSections.length - 1, payload.__step));
+                }
+                if (draftStatus) {
+                    draftStatus.textContent = "Draft status: Restored from saved draft";
+                }
+            } catch (e) {
+                localStorage.removeItem(draftKey);
+            }
+        }
+
+        function jumpToErrorStepIfAny() {
+            const firstError = form.querySelector(".text-error");
+            if (!firstError) return;
+            const parentStep = firstError.closest(".wizard-step");
+            if (!parentStep) return;
+            const idx = Number(parentStep.getAttribute("data-step-index"));
+            if (!Number.isNaN(idx)) {
+                currentStep = idx;
+            }
+        }
+
+        function setStep(index) {
+            currentStep = Math.max(0, Math.min(stepSections.length - 1, index));
+            stepSections.forEach(function (section, i) {
+                section.classList.toggle("hidden", i !== currentStep);
+            });
+            stepChips.forEach(function (chip, i) {
+                const active = i === currentStep;
+                chip.classList.toggle("bg-unite-blue-100", active);
+                chip.classList.toggle("text-unite-blue-600", active);
+                chip.classList.toggle("font-semibold", active);
+                chip.classList.toggle("bg-unite-gray-100", !active);
+                chip.classList.toggle("text-unite-text-main", !active);
+            });
+            prevButton.disabled = currentStep === 0;
+            nextButton.classList.toggle("hidden", currentStep === stepSections.length - 1);
+            submitButton.classList.toggle("hidden", currentStep !== stepSections.length - 1);
+            saveDraft();
+        }
+
+        function validateCurrentStep() {
+            const stepEl = stepSections[currentStep];
+            const stepFields = getStepFields(stepEl);
+            for (const field of stepFields) {
+                if (!field.checkValidity()) {
+                    field.reportValidity();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        stepChips.forEach(function (chip) {
+            chip.addEventListener("click", function () {
+                const target = Number(chip.getAttribute("data-step-chip"));
+                if (Number.isNaN(target)) return;
+                setStep(target);
+            });
+        });
+
+        prevButton.addEventListener("click", function () {
+            setStep(currentStep - 1);
+        });
+
+        nextButton.addEventListener("click", function () {
+            if (!validateCurrentStep()) return;
+            setStep(currentStep + 1);
+        });
+
+        saveDraftButton.addEventListener("click", function () {
+            saveDraft();
+            if (draftStatus) {
+                draftStatus.textContent = "Draft status: Saved manually at " + new Date().toLocaleTimeString();
+            }
+        });
+
+        form.addEventListener("input", saveDraft);
+        form.addEventListener("change", saveDraft);
+
+        restoreDraft();
+        jumpToErrorStepIfAny();
+        setStep(currentStep);
+    })();
+</script>
+{% endblock %}

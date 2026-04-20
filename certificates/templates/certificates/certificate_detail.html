@@ -1,36 +1,134 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Certificate | {{ certificate.course.title }}{% endblock %}
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-10">
-    <div class="no-print mb-4 flex gap-3">
-        <button onclick="window.print()" class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2 rounded-lg">Print Certificate</button>
-        <a href="{% url 'certificates:my-certificates' %}" class="bg-unite-gray-300 px-4 py-2 rounded-lg">Back to Certificates</a>
+<section class="max-w-6xl mx-auto px-4 py-8 lg:py-10">
+    <div class="no-print mb-4 flex flex-wrap gap-3">
+        <button onclick="window.print()" class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2.5 rounded-xl font-semibold">Print Certificate</button>
+        <a href="{% url 'certificates:my-certificates' %}" class="bg-unite-gray-300 hover:bg-unite-gray-100 text-unite-text-main px-4 py-2.5 rounded-xl font-semibold">Back to Certificates</a>
     </div>
 
-    <div class="bg-white border-4 border-unite-navy-500 rounded-xl p-10 text-center">
-        <p class="text-sm tracking-[0.3em] uppercase">Uganda National Institute for Teacher Education</p>
-        <h1 class="text-4xl font-bold mt-3 text-unite-navy-500">Certificate of Completion</h1>
-        <p class="mt-8 text-lg">This certifies that</p>
-        <p class="text-3xl font-semibold mt-2">{{ certificate.user.profile.full_name|default:certificate.user.username }}</p>
-        <p class="mt-6 text-lg">has successfully completed the training course</p>
-        <p class="text-2xl font-semibold mt-2">{{ certificate.course.title }}</p>
-        <p class="mt-6">Final Score: <span class="font-semibold">{{ certificate.final_score }}%</span></p>
-        <div class="grid grid-cols-2 gap-6 mt-10 text-left">
-            <div>
-                <p class="text-sm text-unite-text-main">Certificate Number</p>
-                <p class="font-semibold">{{ certificate.certificate_number }}</p>
+    <article class="relative bg-white rounded-2xl overflow-hidden shadow-sm print:shadow-none">
+        <div class="absolute inset-3 border-2 {{ theme.outer_border }} rounded-xl pointer-events-none"></div>
+        <div class="absolute inset-6 border {{ theme.inner_border }} rounded-lg pointer-events-none"></div>
+
+        <div class="absolute top-5 left-5 h-10 w-10 border-l-4 border-t-4 {{ theme.corner_border }} rounded-tl-md"></div>
+        <div class="absolute top-5 right-5 h-10 w-10 border-r-4 border-t-4 {{ theme.corner_border }} rounded-tr-md"></div>
+        <div class="absolute bottom-5 left-5 h-10 w-10 border-l-4 border-b-4 {{ theme.corner_border }} rounded-bl-md"></div>
+        <div class="absolute bottom-5 right-5 h-10 w-10 border-r-4 border-b-4 {{ theme.corner_border }} rounded-br-md"></div>
+
+        <div class="relative z-10 px-8 py-12 lg:px-14 lg:py-14 text-center">
+            <img src="{% static 'UNITE_Logo.png' %}" alt="UNITE Logo" class="h-16 w-16 mx-auto object-cover rounded-full border border-unite-gray-300">
+            <p class="mt-4 text-xs tracking-[0.35em] uppercase text-unite-text-main">Uganda National Institute for Teacher Education</p>
+            <h1 class="mt-4 text-4xl lg:text-5xl font-bold {{ theme.title_text }}">Certificate of Completion</h1>
+
+            <div class="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-unite-gray-300 {{ theme.badge_bg }} {{ theme.badge_text }} text-xs font-semibold uppercase tracking-wide">
+                Level: {{ certificate_level }}
             </div>
-            <div>
-                <p class="text-sm text-unite-text-main">Date Issued</p>
-                <p class="font-semibold">{{ certificate.issued_at|date:"F d, Y" }}</p>
+
+            <p class="mt-7 text-lg text-unite-text-main">This is proudly awarded to</p>
+            <p class="mt-2 text-3xl lg:text-4xl font-semibold text-unite-navy-500">{{ recipient_name }}</p>
+            <p class="mt-6 text-lg text-unite-text-main">for successfully completing the professional training course</p>
+            <p class="mt-2 text-2xl lg:text-3xl font-semibold text-unite-navy-500">{{ certificate.course.title }}</p>
+
+            <div class="mt-10 grid md:grid-cols-3 gap-4 text-left">
+                <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-wide text-unite-text-main">Certificate Number</p>
+                    <p class="mt-1 font-semibold text-unite-navy-500 break-all">{{ certificate.certificate_number }}</p>
+                </div>
+                <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-wide text-unite-text-main">Date Issued</p>
+                    <p class="mt-1 font-semibold text-unite-navy-500">{{ certificate.issued_at|date:"F d, Y" }}</p>
+                </div>
+                <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-wide text-unite-text-main">Verification Code</p>
+                    <p class="mt-1 font-semibold text-unite-navy-500 break-all">{{ certificate.verification_code }}</p>
+                </div>
             </div>
-            <div class="col-span-2">
-                <p class="text-sm text-unite-text-main">Verification Code</p>
-                <p class="font-semibold">{{ certificate.verification_code }}</p>
-                <p class="text-xs text-unite-text-main mt-1">Verify: /certificates/verify/{{ certificate.verification_code }}/</p>
+
+            <div class="mt-8 grid md:grid-cols-2 gap-8 items-start text-left">
+                <div>
+                    <p class="text-sm text-unite-text-main">Authorized Signature</p>
+                    <div class="mt-6 border-t border-unite-navy-500"></div>
+                    <p class="mt-2 text-sm font-semibold text-unite-navy-500">UNITE Academic Affairs</p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-unite-text-main">Certificate Seal</p>
+                    <div class="mt-3 h-20 w-20 rounded-full border-2 {{ theme.seal_border }} {{ theme.seal_bg }} {{ theme.seal_text }} flex items-center justify-center font-semibold text-xs">UNITE</div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-4 text-left">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Verification Link</p>
+                <p class="mt-1 text-sm text-unite-navy-500 break-all select-all" id="verify-link-text">{{ verify_url }}</p>
+                <div class="mt-4 flex flex-wrap items-start gap-4">
+                    <div id="verify-qr" class="h-[108px] w-[108px] bg-white border border-unite-gray-300 rounded-lg p-2"></div>
+                    <div class="space-y-2">
+                        <p class="text-xs text-unite-text-main">Scan QR to verify quickly.</p>
+                        <button type="button" id="copy-verify-link" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-unite-blue-500 hover:bg-unite-blue-600 text-white text-sm font-semibold no-print">
+                            <i class="fa-regular fa-copy"></i> Copy Link
+                        </button>
+                        <p id="copy-status" class="text-xs text-unite-text-main no-print"></p>
+                    </div>
+                </div>
             </div>
         </div>
-        <p class="mt-10 text-sm text-unite-text-main no-print">PDF download can be added later. Use browser print for this MVP.</p>
-    </div>
-</div>
+    </article>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    (function () {
+        const verifyUrl = "{{ verify_url|escapejs }}";
+        const qrTarget = document.getElementById("verify-qr");
+        if (qrTarget && verifyUrl) {
+            qrTarget.innerHTML = "";
+            new QRCode(qrTarget, {
+                text: verifyUrl,
+                width: 92,
+                height: 92,
+                colorDark: "#1F3A5F",
+                colorLight: "#FFFFFF",
+                correctLevel: QRCode.CorrectLevel.M,
+            });
+        }
+
+        const copyButton = document.getElementById("copy-verify-link");
+        const copyStatus = document.getElementById("copy-status");
+        const linkText = document.getElementById("verify-link-text");
+
+        async function copyText(text) {
+            if (!text) return false;
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            }
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const ok = document.execCommand("copy");
+            document.body.removeChild(textArea);
+            return ok;
+        }
+
+        if (copyButton && linkText) {
+            copyButton.addEventListener("click", async function () {
+                const value = (linkText.textContent || "").trim();
+                try {
+                    const copied = await copyText(value);
+                    copyStatus.textContent = copied ? "Link copied." : "Unable to copy link.";
+                } catch (e) {
+                    copyStatus.textContent = "Unable to copy link.";
+                }
+            });
+        }
+    })();
+</script>
 {% endblock %}

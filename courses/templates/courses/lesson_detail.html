@@ -39,6 +39,12 @@
         max-height: none;
         border-radius: 1rem;
     }
+    #chat-panel {
+        overflow: hidden;
+    }
+    #chat-messages {
+        scrollbar-width: thin;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -112,7 +118,9 @@
                 {% if lesson.ai_summary %}
                     <div class="mt-5 p-4 bg-white border border-success rounded-xl">
                         <p class="font-semibold text-unite-navy-500">AI Summary</p>
-                        <div class="mt-1 text-sm text-unite-text-main whitespace-pre-line">{{ lesson.ai_summary }}</div>
+                        <div class="mt-2 max-h-72 overflow-y-auto pr-1 border border-unite-gray-300 rounded-lg p-3 bg-unite-gray-100">
+                            <div class="ai-md text-sm text-unite-text-main" data-md="{{ lesson.ai_summary|escapejs }}"></div>
+                        </div>
                         {% if lesson.ai_keywords %}<p class="mt-2 text-xs text-success"><span class="font-semibold">Keywords:</span> {{ lesson.ai_keywords }}</p>{% endif %}
                     </div>
                 {% endif %}
@@ -140,6 +148,10 @@
                     {% else %}
                         <span class="px-4 py-2 rounded-xl bg-white text-success text-sm font-semibold">Completed</span>
                     {% endif %}
+                </div>
+
+                <div class="mt-5 p-3 rounded-xl bg-unite-blue-100 border border-unite-blue-500 text-sm text-unite-text-main no-print">
+                    For more information and step-by-step clarification, consult our AI Tutor.
                 </div>
             </div>
         </article>
@@ -312,14 +324,13 @@
         }
 
         function renderExistingMarkdown() {
-            const bubbles = messagesWrap.querySelectorAll("[data-md]");
-            bubbles.forEach(function (block) {
+            const markdownBlocks = document.querySelectorAll("[data-md]");
+            markdownBlocks.forEach(function (block) {
                 const raw = block.getAttribute("data-md") || "";
                 const html = marked.parse(normalizeAIText(raw));
                 block.innerHTML = DOMPurify.sanitize(html);
-                const row = block.closest("div.text-right, div:not(.text-right)");
                 const bubble = block.closest(".inline-block");
-                if (bubble && !bubble.classList.contains("bg-unite-blue-500")) {
+                if (bubble && messagesWrap.contains(bubble) && !bubble.classList.contains("bg-unite-blue-500")) {
                     const wrap = bubble.parentElement;
                     if (wrap && !wrap.querySelector("button")) {
                         attachCopyButton(wrap, block);

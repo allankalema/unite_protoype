@@ -160,9 +160,18 @@ def generate_lesson_summary(lesson):
     prompt = f"""
 You are supporting teacher professional development at UNITE.
 Summarize this lesson for teachers in Uganda in simple, practical language.
-Return:
-1) A concise summary (4-6 bullet points)
-2) Keywords line starting with 'Keywords:'
+Return the output in MARKDOWN with this exact structure:
+
+## Lesson Snapshot
+- 4 to 6 concise bullet points describing the core ideas
+
+## Classroom Application
+- 2 to 4 practical actions a teacher can immediately apply
+
+## Reflection Prompt
+- 1 short reflective question for a teacher
+
+Keywords: keyword1, keyword2, keyword3, keyword4
 
 Lesson title: {lesson.title}
 Lesson type: {lesson.lesson_type}

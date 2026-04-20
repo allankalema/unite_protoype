@@ -9,15 +9,15 @@
                 <div class="flex justify-between mb-2">
                     <div>
                         <p class="font-semibold">{{ session.user.username }} - {{ session.title|default:'Session' }}</p>
-                        <p class="text-sm text-slate-600">{% if session.lesson %}Lesson: {{ session.lesson.title }}{% elif session.course %}Course: {{ session.course.title }}{% else %}General{% endif %}</p>
+                        <p class="text-sm text-unite-text-main">{% if session.lesson %}Lesson: {{ session.lesson.title }}{% elif session.course %}Course: {{ session.course.title }}{% else %}General{% endif %}</p>
                     </div>
-                    <p class="text-sm text-slate-500">{{ session.updated_at|date:"M d, Y H:i" }}</p>
+                    <p class="text-sm text-unite-text-main">{{ session.updated_at|date:"M d, Y H:i" }}</p>
                 </div>
-                <div class="bg-slate-50 border rounded p-3 max-h-52 overflow-y-auto text-sm">
+                <div class="bg-unite-gray-100 border rounded p-3 max-h-52 overflow-y-auto text-sm">
                     {% for message in session.messages.all %}
                         <p class="py-1"><span class="font-semibold uppercase">{{ message.role }}:</span> {{ message.message|truncatechars:220 }}</p>
                     {% empty %}
-                        <p class="text-slate-500">No messages in this session.</p>
+                        <p class="text-unite-text-main">No messages in this session.</p>
                     {% endfor %}
                 </div>
             </div>

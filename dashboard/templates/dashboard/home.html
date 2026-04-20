@@ -5,43 +5,43 @@
     <h1 class="text-3xl font-bold mb-6">Staff Dashboard</h1>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Total Users</p><p class="text-2xl font-bold">{{ total_users }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Teachers</p><p class="text-2xl font-bold">{{ total_teachers }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Courses</p><p class="text-2xl font-bold">{{ total_courses }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Enrollments</p><p class="text-2xl font-bold">{{ total_enrollments }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Completed Enrollments</p><p class="text-2xl font-bold">{{ completed_enrollments }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Completion Rate</p><p class="text-2xl font-bold">{{ completion_rate }}%</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">Certificates Issued</p><p class="text-2xl font-bold">{{ certificates_issued }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">AI Sessions</p><p class="text-2xl font-bold">{{ total_ai_sessions }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">AI Messages</p><p class="text-2xl font-bold">{{ total_ai_messages }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Total Users</p><p class="text-2xl font-bold">{{ total_users }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Teachers</p><p class="text-2xl font-bold">{{ total_teachers }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Courses</p><p class="text-2xl font-bold">{{ total_courses }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Enrollments</p><p class="text-2xl font-bold">{{ total_enrollments }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Completed Enrollments</p><p class="text-2xl font-bold">{{ completed_enrollments }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Completion Rate</p><p class="text-2xl font-bold">{{ completion_rate }}%</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">Certificates Issued</p><p class="text-2xl font-bold">{{ certificates_issued }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">AI Sessions</p><p class="text-2xl font-bold">{{ total_ai_sessions }}</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-sm text-unite-text-main">AI Messages</p><p class="text-2xl font-bold">{{ total_ai_messages }}</p></div>
     </div>
 
     <div class="mt-8 grid md:grid-cols-2 gap-4">
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-courses' %}">Manage Courses</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-modules' %}">Manage Modules</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-lessons' %}">Manage Lessons</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-resources' %}">Manage Lesson Resources</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:manage-quizzes' %}">Manage Quizzes & Questions</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:enrollments' %}">View Enrollments</a>
-        <a class="bg-white border rounded-xl p-4 hover:bg-slate-50" href="{% url 'dashboard:ai-logs' %}">View AI Logs</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:manage-courses' %}">Manage Courses</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:manage-modules' %}">Manage Modules</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:manage-lessons' %}">Manage Lessons</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:manage-resources' %}">Manage Lesson Resources</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:manage-quizzes' %}">Manage Quizzes & Questions</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:enrollments' %}">View Enrollments</a>
+        <a class="bg-white border rounded-xl p-4 hover:bg-unite-gray-100" href="{% url 'dashboard:ai-logs' %}">View AI Logs</a>
     </div>
 
     <div class="grid lg:grid-cols-4 gap-6 mt-10">
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent Enrollments</h2>
-            {% for item in recent_enrollments %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-slate-500">No enrollments yet.</p>{% endfor %}
+            {% for item in recent_enrollments %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-unite-text-main">No enrollments yet.</p>{% endfor %}
         </div>
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent Completions</h2>
-            {% for item in recent_completions %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-slate-500">No completions yet.</p>{% endfor %}
+            {% for item in recent_completions %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-unite-text-main">No completions yet.</p>{% endfor %}
         </div>
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent Certificates</h2>
-            {% for item in recent_certificates %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-slate-500">No certificates yet.</p>{% endfor %}
+            {% for item in recent_certificates %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.course.title }}</p>{% empty %}<p class="text-sm text-unite-text-main">No certificates yet.</p>{% endfor %}
         </div>
         <div class="bg-white border rounded-xl p-4">
             <h2 class="font-bold mb-3">Recent AI Sessions</h2>
-            {% for item in recent_sessions %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.title|default:'Session' }}</p>{% empty %}<p class="text-sm text-slate-500">No AI sessions yet.</p>{% endfor %}
+            {% for item in recent_sessions %}<p class="text-sm py-1">{{ item.user.username }} - {{ item.title|default:'Session' }}</p>{% empty %}<p class="text-sm text-unite-text-main">No AI sessions yet.</p>{% endfor %}
         </div>
     </div>
 </div>

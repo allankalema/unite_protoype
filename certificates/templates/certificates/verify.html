@@ -5,7 +5,7 @@
     <div class="bg-white border rounded-xl p-8">
         <h1 class="text-2xl font-bold">Certificate Verification</h1>
         {% if certificate %}
-            <p class="mt-4 text-emerald-700 font-semibold">Valid certificate.</p>
+            <p class="mt-4 text-success font-semibold">Valid certificate.</p>
             <div class="mt-5 space-y-2">
                 <p><span class="font-semibold">Teacher:</span> {{ certificate.user.profile.full_name|default:certificate.user.username }}</p>
                 <p><span class="font-semibold">Course:</span> {{ certificate.course.title }}</p>
@@ -14,7 +14,7 @@
                 <p><span class="font-semibold">Verification Code:</span> {{ certificate.verification_code }}</p>
             </div>
         {% else %}
-            <p class="mt-4 text-rose-700 font-semibold">No certificate found for code: {{ code }}</p>
+            <p class="mt-4 text-error font-semibold">No certificate found for code: {{ code }}</p>
         {% endif %}
     </div>
 </div>

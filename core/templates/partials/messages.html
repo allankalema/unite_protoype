@@ -1,6 +1,6 @@
 {% if messages %}
-<div class="max-w-7xl mx-auto px-4 mt-4 no-print">
-    <div class="animate-[fadeIn_.2s_ease-out]">
+<div class="fixed top-20 right-4 z-[60] w-[min(92vw,380px)] no-print">
+    <div class="space-y-2 animate-[fadeIn_.2s_ease-out]">
         {% for message in messages %}
             {% if message.tags == 'error' %}
                 {% include 'partials/alert.html' with level='error' text=message alert_id=forloop.counter %}

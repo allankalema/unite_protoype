@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}UNITE eLearn | Teacher Training{% endblock %}
 {% block content %}
-<section class="bg-gradient-to-br from-unite-navy via-slate-900 to-unite-blue text-white">
+<section class="bg-gradient-to-br from-unite-navy-500 via-unite-navy-500 to-unite-blue-500 text-white">
     <div class="max-w-7xl mx-auto px-4 py-20 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-            <p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] bg-white/10 rounded-full px-4 py-2">
-                <i class="fa-solid fa-landmark text-unite-orange"></i> National Teacher Development Platform
+            <p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] bg-unite-blue-100 text-unite-navy-500 rounded-full px-4 py-2">
+                <i class="fa-solid fa-landmark text-unite-orange-500"></i> National Teacher Development Platform
             </p>
             <h1 class="mt-5 text-4xl md:text-5xl font-bold leading-tight">Build confident, classroom-ready teachers with guided digital learning.</h1>
-            <p class="mt-5 text-slate-200 max-w-xl leading-7">
+            <p class="mt-5 text-white max-w-xl leading-7">
                 UNITE eLearn combines structured teacher training courses, lesson-by-lesson support, and AI tutoring
                 to strengthen instruction quality across schools.
             </p>
@@ -19,68 +19,68 @@
                 {% include 'partials/button.html' with href=courses_url variant='secondary' label='Browse Courses' icon='fa-solid fa-book' %}
             </div>
         </div>
-        <div class="bg-white/10 border border-white/20 rounded-2xl p-6 backdrop-blur-sm">
-            <h2 class="font-semibold text-lg">Why institutions choose UNITE eLearn</h2>
-            <ul class="mt-4 space-y-3 text-sm text-slate-200">
-                <li class="flex gap-3"><i class="fa-solid fa-circle-check text-unite-orange mt-0.5"></i><span>Structured modules aligned to teacher competency development.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-circle-check text-unite-orange mt-0.5"></i><span>Progress tracking with quiz evidence and completion analytics.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-circle-check text-unite-orange mt-0.5"></i><span>AI tutor for practical classroom explanations in local contexts.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-circle-check text-unite-orange mt-0.5"></i><span>Verifiable certificates for transparent professional development.</span></li>
+        <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+            <h2 class="font-semibold text-lg text-unite-navy-500">Why institutions choose UNITE eLearn</h2>
+            <ul class="mt-4 space-y-3 text-sm text-white">
+                <li class="flex gap-3 text-unite-text-main"><i class="fa-solid fa-circle-check text-unite-orange-500 mt-0.5"></i><span>Structured modules aligned to teacher competency development.</span></li>
+                <li class="flex gap-3 text-unite-text-main"><i class="fa-solid fa-circle-check text-unite-orange-500 mt-0.5"></i><span>Progress tracking with quiz evidence and completion analytics.</span></li>
+                <li class="flex gap-3 text-unite-text-main"><i class="fa-solid fa-circle-check text-unite-orange-500 mt-0.5"></i><span>AI tutor for practical classroom explanations in local contexts.</span></li>
+                <li class="flex gap-3 text-unite-text-main"><i class="fa-solid fa-circle-check text-unite-orange-500 mt-0.5"></i><span>Verifiable certificates for transparent professional development.</span></li>
             </ul>
         </div>
     </div>
 </section>
 
 <section class="max-w-7xl mx-auto px-4 py-14 grid md:grid-cols-3 gap-6">
-    <article class="bg-white border border-slate-200 rounded-2xl p-6">
-        <div class="h-11 w-11 rounded-xl bg-orange-100 text-unite-orange grid place-items-center"><i class="fa-solid fa-graduation-cap"></i></div>
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <div class="h-11 w-11 rounded-xl bg-unite-orange-100 text-unite-orange-500 grid place-items-center"><i class="fa-solid fa-graduation-cap"></i></div>
         <h3 class="font-semibold text-lg mt-4">Practical Teacher Learning</h3>
-        <p class="mt-2 text-slate-600 text-sm leading-6">Teachers learn with clear modules, realistic examples, and guided learning objectives.</p>
+        <p class="mt-2 text-unite-text-main text-sm leading-6">Teachers learn with clear modules, realistic examples, and guided learning objectives.</p>
     </article>
-    <article class="bg-white border border-slate-200 rounded-2xl p-6">
-        <div class="h-11 w-11 rounded-xl bg-blue-100 text-unite-blue grid place-items-center"><i class="fa-solid fa-robot"></i></div>
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <div class="h-11 w-11 rounded-xl bg-unite-blue-100 text-unite-blue-500 grid place-items-center"><i class="fa-solid fa-robot"></i></div>
         <h3 class="font-semibold text-lg mt-4">AI Tutor Support</h3>
-        <p class="mt-2 text-slate-600 text-sm leading-6">Teachers ask questions in context and receive simple explanations with classroom application tips.</p>
+        <p class="mt-2 text-unite-text-main text-sm leading-6">Teachers ask questions in context and receive simple explanations with classroom application tips.</p>
     </article>
-    <article class="bg-white border border-slate-200 rounded-2xl p-6">
-        <div class="h-11 w-11 rounded-xl bg-slate-200 text-unite-navy grid place-items-center"><i class="fa-solid fa-certificate"></i></div>
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <div class="h-11 w-11 rounded-xl bg-unite-gray-300 text-unite-navy-500 grid place-items-center"><i class="fa-solid fa-certificate"></i></div>
         <h3 class="font-semibold text-lg mt-4">Trusted Certification</h3>
-        <p class="mt-2 text-slate-600 text-sm leading-6">Completion and performance are captured with verifiable certificates for institutional reporting.</p>
+        <p class="mt-2 text-unite-text-main text-sm leading-6">Completion and performance are captured with verifiable certificates for institutional reporting.</p>
     </article>
 </section>
 
 <section class="max-w-7xl mx-auto px-4 pb-16">
     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
-        <h2 class="text-2xl font-bold text-unite-navy">Featured Courses</h2>
-        <a href="{% url 'courses:list' %}" class="text-unite-blue font-semibold text-sm hover:underline">View full catalog</a>
+        <h2 class="text-2xl font-bold text-unite-navy-500">Featured Courses</h2>
+        <a href="{% url 'courses:list' %}" class="text-unite-blue-500 font-semibold text-sm hover:underline">View full catalog</a>
     </div>
 
     <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {% for course in featured_courses %}
-            <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <article class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
                 {% if course.cover_image %}
                     <img src="{{ course.cover_image }}" alt="{{ course.title }}" class="h-40 w-full object-cover">
                 {% else %}
-                    <div class="h-40 w-full bg-gradient-to-br from-orange-100 via-white to-blue-100 grid place-items-center text-unite-blue">
+                    <div class="h-40 w-full bg-gradient-to-br from-unite-orange-100 via-white to-unite-blue-100 grid place-items-center text-unite-blue-500">
                         <div class="text-center">
                             <i class="fa-solid fa-image text-2xl"></i>
-                            <p class="mt-2 text-xs text-slate-600">Course Visual</p>
+                            <p class="mt-2 text-xs text-unite-text-main">Course Visual</p>
                         </div>
                     </div>
                 {% endif %}
                 <div class="p-5">
                     <h3 class="font-semibold text-lg">{{ course.title }}</h3>
-                    <p class="text-sm text-slate-600 mt-2">{{ course.short_description }}</p>
-                    <a href="{% url 'courses:detail' course.slug %}" class="inline-flex items-center gap-2 mt-4 text-unite-blue font-semibold text-sm">
+                    <p class="text-sm text-unite-text-main mt-2">{{ course.short_description }}</p>
+                    <a href="{% url 'courses:detail' course.slug %}" class="inline-flex items-center gap-2 mt-4 text-unite-blue-500 font-semibold text-sm">
                         Open Course <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
             </article>
         {% empty %}
-            <div class="md:col-span-2 xl:col-span-3 bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center">
-                <i class="fa-solid fa-book-open text-3xl text-slate-400"></i>
-                <p class="mt-3 font-semibold text-slate-700">No featured courses yet</p>
-                <p class="mt-1 text-sm text-slate-500">Courses published by staff will appear here.</p>
+            <div class="md:col-span-2 xl:col-span-3 bg-white border border-dashed border-unite-gray-300 rounded-2xl p-10 text-center">
+                <i class="fa-solid fa-book-open text-3xl text-unite-text-main"></i>
+                <p class="mt-3 font-semibold text-unite-text-main">No featured courses yet</p>
+                <p class="mt-1 text-sm text-unite-text-main">Courses published by staff will appear here.</p>
             </div>
         {% endfor %}
     </div>

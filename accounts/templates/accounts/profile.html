@@ -2,15 +2,15 @@
 {% block title %}Profile | UNITE eLearn{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 py-10">
-    <div class="bg-white border border-slate-200 rounded-2xl p-6">
-        <h1 class="text-2xl font-bold text-unite-navy">My Profile</h1>
-        <p class="text-slate-600 mt-1">Role: <span class="font-semibold uppercase">{{ profile.role }}</span></p>
+    <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <h1 class="text-2xl font-bold text-unite-navy-500">My Profile</h1>
+        <p class="text-unite-text-main mt-1">Role: <span class="font-semibold uppercase">{{ profile.role }}</span></p>
         <form method="post" class="space-y-4 mt-6">
             {% csrf_token %}
             {% for field in form %}
                 {% include 'partials/form_field.html' with field=field %}
             {% endfor %}
-            <button class="bg-unite-blue text-white px-5 py-2.5 rounded-xl font-semibold hover:opacity-90" type="submit" data-loading="1">Save Profile</button>
+            <button class="bg-unite-blue-500 hover:bg-unite-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold " type="submit" data-loading="1">Save Profile</button>
         </form>
     </div>
 </div>

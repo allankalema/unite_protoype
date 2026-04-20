@@ -2,22 +2,22 @@
 {% block title %}AI Tutor{% endblock %}
 {% block content %}
 <section class="max-w-5xl mx-auto px-4 py-10">
-    <div class="bg-white border border-slate-200 rounded-2xl p-6">
-        <h1 class="text-2xl font-bold text-unite-navy">AI Tutor</h1>
-        <p class="text-slate-600 mt-1">
+    <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <h1 class="text-2xl font-bold text-unite-navy-500">AI Tutor</h1>
+        <p class="text-unite-text-main mt-1">
             {% if lesson %}Lesson context: {{ lesson.title }}{% elif course %}Course context: {{ course.title }}{% else %}General teacher training support{% endif %}
         </p>
 
         <div id="chat-messages" class="mt-6 space-y-3 max-h-[460px] overflow-y-auto pr-1">
             {% for msg in messages_list %}
                 <div class="{% if msg.role == 'user' %}text-right{% endif %}">
-                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-xl text-sm {% if msg.role == 'user' %}bg-unite-blue text-white{% else %}bg-slate-100 text-slate-800{% endif %}">
+                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-xl text-sm {% if msg.role == 'user' %}bg-unite-blue-500 hover:bg-unite-blue-600 text-white{% else %}bg-unite-gray-100 text-unite-text-main{% endif %}">
                         <p class="text-[11px] mb-1 opacity-70 uppercase">{{ msg.role }}</p>
                         <p class="whitespace-pre-line">{{ msg.message }}</p>
                     </div>
                 </div>
             {% empty %}
-                <div class="text-center py-10 text-slate-500">
+                <div class="text-center py-10 text-unite-text-main">
                     <i class="fa-regular fa-comments text-3xl"></i>
                     <p class="mt-2 text-sm">No messages yet. Ask your first question.</p>
                 </div>
@@ -32,7 +32,7 @@
                     {% include 'partials/form_field.html' with field=field %}
                 {% endfor %}
             </div>
-            <button type="submit" data-loading="1" class="px-5 py-2.5 rounded-xl bg-unite-orange text-white font-semibold hover:opacity-90">Send Message</button>
+            <button type="submit" data-loading="1" class="px-5 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold ">Send Message</button>
         </form>
     </div>
 </section>

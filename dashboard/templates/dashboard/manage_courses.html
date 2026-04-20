@@ -4,14 +4,14 @@
 <div class="max-w-7xl mx-auto px-4 py-10">
     <div class="flex justify-between items-center mb-5">
         <h1 class="text-2xl font-bold">Manage Courses</h1>
-        <a class="bg-unite-orange text-white px-4 py-2 rounded-xl" href="{% url 'dashboard:create-course' %}">Create Course</a>
+        <a class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2 rounded-xl" href="{% url 'dashboard:create-course' %}">Create Course</a>
     </div>
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+    <div class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-slate-100"><tr><th class="text-left p-3">Title</th><th class="p-3">Published</th><th class="p-3">Actions</th></tr></thead>
+            <thead class="bg-unite-gray-100"><tr><th class="text-left p-3">Title</th><th class="p-3">Published</th><th class="p-3">Actions</th></tr></thead>
             <tbody>
                 {% for course in courses %}
-                    <tr class="border-t"><td class="p-3">{{ course.title }}</td><td class="p-3">{{ course.is_published }}</td><td class="p-3"><a class="text-unite-blue" href="{% url 'dashboard:edit-course' course.id %}">Edit</a> | <a class="text-rose-700" href="{% url 'dashboard:delete-course' course.id %}">Delete</a></td></tr>
+                    <tr class="border-t"><td class="p-3">{{ course.title }}</td><td class="p-3">{{ course.is_published }}</td><td class="p-3"><a class="text-unite-blue-500" href="{% url 'dashboard:edit-course' course.id %}">Edit</a> | <a class="text-error" href="{% url 'dashboard:delete-course' course.id %}">Delete</a></td></tr>
                 {% empty %}
                     <tr><td class="p-3" colspan="3">No courses yet.</td></tr>
                 {% endfor %}

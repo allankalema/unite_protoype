@@ -9,18 +9,18 @@
                 <div class="flex flex-wrap justify-between gap-4">
                     <div>
                         <h2 class="text-xl font-semibold">{{ row.enrollment.course.title }}</h2>
-                        <p class="text-slate-600">Enrolled {{ row.enrollment.enrolled_at|date:"M d, Y" }}</p>
+                        <p class="text-unite-text-main">Enrolled {{ row.enrollment.enrolled_at|date:"M d, Y" }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm text-slate-500">Progress</p>
+                        <p class="text-sm text-unite-text-main">Progress</p>
                         <p class="font-bold text-lg">{{ row.progress }}%</p>
                     </div>
                 </div>
-                <div class="mt-3 bg-slate-200 rounded-full h-2"><div class="bg-unite-blue h-2 rounded-full" style="width:{{ row.progress }}%"></div></div>
-                <a href="{% url 'courses:learn' row.enrollment.course.slug %}" class="inline-block mt-4 text-unite-blue font-semibold">Open Learning Page</a>
+                <div class="mt-3 bg-unite-gray-300 rounded-full h-2"><div class="bg-unite-blue-500 h-2 rounded-full" style="width:{{ row.progress }}%"></div></div>
+                <a href="{% url 'courses:learn' row.enrollment.course.slug %}" class="inline-block mt-4 text-unite-blue-500 font-semibold">Open Learning Page</a>
             </div>
         {% empty %}
-            <div class="bg-white border rounded-xl p-6">You have not enrolled in any course yet. <a class="text-unite-blue" href="{% url 'courses:list' %}">Browse courses</a>.</div>
+            <div class="bg-white border rounded-xl p-6">You have not enrolled in any course yet. <a class="text-unite-blue-500" href="{% url 'courses:list' %}">Browse courses</a>.</div>
         {% endfor %}
     </div>
 </div>

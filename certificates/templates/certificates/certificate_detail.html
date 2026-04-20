@@ -3,13 +3,13 @@
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-10">
     <div class="no-print mb-4 flex gap-3">
-        <button onclick="window.print()" class="bg-unite-orange text-white px-4 py-2 rounded-lg">Print Certificate</button>
-        <a href="{% url 'certificates:my-certificates' %}" class="bg-slate-200 px-4 py-2 rounded-lg">Back to Certificates</a>
+        <button onclick="window.print()" class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2 rounded-lg">Print Certificate</button>
+        <a href="{% url 'certificates:my-certificates' %}" class="bg-unite-gray-300 px-4 py-2 rounded-lg">Back to Certificates</a>
     </div>
 
-    <div class="bg-white border-4 border-unite-navy rounded-xl p-10 text-center">
+    <div class="bg-white border-4 border-unite-navy-500 rounded-xl p-10 text-center">
         <p class="text-sm tracking-[0.3em] uppercase">Uganda National Institute for Teacher Education</p>
-        <h1 class="text-4xl font-bold mt-3 text-unite-navy">Certificate of Completion</h1>
+        <h1 class="text-4xl font-bold mt-3 text-unite-navy-500">Certificate of Completion</h1>
         <p class="mt-8 text-lg">This certifies that</p>
         <p class="text-3xl font-semibold mt-2">{{ certificate.user.profile.full_name|default:certificate.user.username }}</p>
         <p class="mt-6 text-lg">has successfully completed the training course</p>
@@ -17,20 +17,20 @@
         <p class="mt-6">Final Score: <span class="font-semibold">{{ certificate.final_score }}%</span></p>
         <div class="grid grid-cols-2 gap-6 mt-10 text-left">
             <div>
-                <p class="text-sm text-slate-600">Certificate Number</p>
+                <p class="text-sm text-unite-text-main">Certificate Number</p>
                 <p class="font-semibold">{{ certificate.certificate_number }}</p>
             </div>
             <div>
-                <p class="text-sm text-slate-600">Date Issued</p>
+                <p class="text-sm text-unite-text-main">Date Issued</p>
                 <p class="font-semibold">{{ certificate.issued_at|date:"F d, Y" }}</p>
             </div>
             <div class="col-span-2">
-                <p class="text-sm text-slate-600">Verification Code</p>
+                <p class="text-sm text-unite-text-main">Verification Code</p>
                 <p class="font-semibold">{{ certificate.verification_code }}</p>
-                <p class="text-xs text-slate-500 mt-1">Verify: /certificates/verify/{{ certificate.verification_code }}/</p>
+                <p class="text-xs text-unite-text-main mt-1">Verify: /certificates/verify/{{ certificate.verification_code }}/</p>
             </div>
         </div>
-        <p class="mt-10 text-sm text-slate-500 no-print">PDF download can be added later. Use browser print for this MVP.</p>
+        <p class="mt-10 text-sm text-unite-text-main no-print">PDF download can be added later. Use browser print for this MVP.</p>
     </div>
 </div>
 {% endblock %}

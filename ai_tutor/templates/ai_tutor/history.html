@@ -2,25 +2,25 @@
 {% block title %}AI Chat History{% endblock %}
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-10">
-    <h1 class="text-3xl font-bold mb-6 text-unite-navy">AI Tutor Sessions</h1>
+    <h1 class="text-3xl font-bold mb-6 text-unite-navy-500">AI Tutor Sessions</h1>
     <div class="space-y-3">
         {% for session in sessions %}
-            <a href="{% url 'ai_tutor:chat' %}?session_id={{ session.id }}" class="block bg-white border border-slate-200 rounded-2xl p-4 hover:bg-slate-50">
+            <a href="{% url 'ai_tutor:chat' %}?session_id={{ session.id }}" class="block bg-white border border-unite-gray-300 rounded-2xl p-4 hover:bg-unite-gray-100">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="font-semibold text-unite-navy">{{ session.title|default:'AI Tutor Session' }}</p>
-                        <p class="text-sm text-slate-600">
+                        <p class="font-semibold text-unite-navy-500">{{ session.title|default:'AI Tutor Session' }}</p>
+                        <p class="text-sm text-unite-text-main">
                             {% if session.lesson %}Lesson: {{ session.lesson.title }}{% elif session.course %}Course: {{ session.course.title }}{% else %}General{% endif %}
                         </p>
                     </div>
-                    <p class="text-sm text-slate-500">{{ session.updated_at|date:"M d, Y H:i" }}</p>
+                    <p class="text-sm text-unite-text-main">{{ session.updated_at|date:"M d, Y H:i" }}</p>
                 </div>
             </a>
         {% empty %}
-            <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-slate-600 text-center">
-                <i class="fa-regular fa-comments text-3xl text-slate-400"></i>
-                <p class="mt-3 font-semibold text-unite-navy">No chat sessions yet</p>
-                <p class="mt-1 text-sm text-slate-500">Start from any lesson and open AI Tutor to begin.</p>
+            <div class="bg-white border border-dashed border-unite-gray-300 rounded-2xl p-8 text-unite-text-main text-center">
+                <i class="fa-regular fa-comments text-3xl text-unite-text-main"></i>
+                <p class="mt-3 font-semibold text-unite-navy-500">No chat sessions yet</p>
+                <p class="mt-1 text-sm text-unite-text-main">Start from any lesson and open AI Tutor to begin.</p>
             </div>
         {% endfor %}
     </div>

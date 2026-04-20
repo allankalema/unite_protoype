@@ -2,22 +2,22 @@
 {% block title %}Register | UNITE eLearn{% endblock %}
 {% block content %}
 <div class="max-w-xl mx-auto px-4 py-12">
-    <div class="bg-white border border-slate-200 rounded-2xl p-6">
-        <h1 class="text-2xl font-bold mb-1 text-unite-navy">Teacher Registration</h1>
-        <p class="text-slate-600 mb-6">Create your account to start training courses.</p>
+    <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <h1 class="text-2xl font-bold mb-1 text-unite-navy-500">Teacher Registration</h1>
+        <p class="text-unite-text-main mb-6">Create your account to start training courses.</p>
         <form method="post" class="space-y-4">
             {% csrf_token %}
             {% if form.non_field_errors %}
-                <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                <div class="p-3 rounded-xl bg-white border border-error text-error text-sm">
                     {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
                 </div>
             {% endif %}
             {% for field in form %}
                 {% include 'partials/form_field.html' with field=field %}
             {% endfor %}
-            <button class="w-full bg-unite-orange text-white py-2.5 rounded-xl font-semibold hover:opacity-90" type="submit" data-loading="1">Create Account</button>
+            <button class="w-full bg-unite-orange-500 hover:bg-unite-orange-600 text-white py-2.5 rounded-xl font-semibold " type="submit" data-loading="1">Create Account</button>
         </form>
-        <p class="mt-4 text-sm">Already have an account? <a class="text-unite-blue font-semibold" href="{% url 'accounts:login' %}">Login</a></p>
+        <p class="mt-4 text-sm">Already have an account? <a class="text-unite-blue-500 font-semibold" href="{% url 'accounts:login' %}">Login</a></p>
     </div>
 </div>
 {% endblock %}

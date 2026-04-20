@@ -1,29 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Manage Lesson Resources{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex justify-between items-center mb-5">
-        <h1 class="text-2xl font-bold">Manage Lesson Resources</h1>
-        <a class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2 rounded-xl" href="{% url 'dashboard:create-resource' %}">Add Resource</a>
-    </div>
+<section class="max-w-7xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6 lg:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Dashboard</p>
+                <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">Manage Lesson Resources</h1>
+                <p class="mt-2 text-unite-text-main">Track and maintain all supporting files and links attached to lessons.</p>
+            </div>
+            <a class="inline-flex items-center gap-2 bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2.5 rounded-xl font-semibold" href="{% url 'dashboard:create-resource' %}">
+                <i class="fa-solid fa-plus"></i> Add Resource
+            </a>
+        </div>
+    </header>
+
     <div class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-unite-gray-100"><tr><th class="text-left p-3">Title</th><th class="p-3">Type</th><th class="p-3">Lesson</th><th class="p-3">Module</th><th class="p-3">Course</th><th class="p-3">Actions</th></tr></thead>
-            <tbody>
-                {% for resource in resources %}
-                    <tr class="border-t">
-                        <td class="p-3"><a class="text-unite-blue-500" target="_blank" href="{{ resource.file_url }}">{{ resource.title }}</a></td>
-                        <td class="p-3 uppercase">{{ resource.resource_type }}</td>
-                        <td class="p-3">{{ resource.lesson.title }}</td>
-                        <td class="p-3">{{ resource.lesson.module.title }}</td>
-                        <td class="p-3">{{ resource.lesson.module.course.title }}</td>
-                        <td class="p-3"><a class="text-unite-blue-500" href="{% url 'dashboard:edit-resource' resource.id %}">Edit</a> | <a class="text-error" href="{% url 'dashboard:delete-resource' resource.id %}">Delete</a></td>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[920px]">
+                <thead class="bg-unite-gray-100 text-unite-navy-500">
+                    <tr>
+                        <th class="text-left p-3 font-semibold">Title</th>
+                        <th class="text-left p-3 font-semibold">Type</th>
+                        <th class="text-left p-3 font-semibold">Lesson</th>
+                        <th class="text-left p-3 font-semibold">Module</th>
+                        <th class="text-left p-3 font-semibold">Course</th>
+                        <th class="text-left p-3 font-semibold">Actions</th>
                     </tr>
-                {% empty %}
-                    <tr><td class="p-3" colspan="6">No resources yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for resource in resources %}
+                        <tr class="border-t border-unite-gray-300">
+                            <td class="p-3"><a class="text-unite-blue-500 hover:text-unite-blue-600 font-semibold" target="_blank" href="{{ resource.file_url }}">{{ resource.title }}</a></td>
+                            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600 font-semibold uppercase">{{ resource.resource_type }}</span></td>
+                            <td class="p-3 text-unite-text-main">{{ resource.lesson.title }}</td>
+                            <td class="p-3 text-unite-text-main">{{ resource.lesson.module.title }}</td>
+                            <td class="p-3 text-unite-text-main">{{ resource.lesson.module.course.title }}</td>
+                            <td class="p-3">
+                                <div class="flex items-center gap-3">
+                                    <a class="text-unite-blue-500 hover:text-unite-blue-600 font-semibold" href="{% url 'dashboard:edit-resource' resource.id %}">Edit</a>
+                                    <a class="text-error hover:underline font-semibold" href="{% url 'dashboard:delete-resource' resource.id %}">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td class="p-5 text-unite-text-main" colspan="6">No resources yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

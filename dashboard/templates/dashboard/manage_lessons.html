@@ -1,16 +1,56 @@
 {% extends 'base.html' %}
 {% block title %}Manage Lessons{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex justify-between items-center mb-5">
-        <h1 class="text-2xl font-bold">Manage Lessons</h1>
-        <a class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2 rounded-xl" href="{% url 'dashboard:create-lesson' %}">Create Lesson</a>
-    </div>
+<section class="max-w-7xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6 lg:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Dashboard</p>
+                <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">Manage Lessons</h1>
+                <p class="mt-2 text-unite-text-main">Maintain lesson content, type, duration, and resource coverage.</p>
+            </div>
+            <a class="inline-flex items-center gap-2 bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-4 py-2.5 rounded-xl font-semibold" href="{% url 'dashboard:create-lesson' %}">
+                <i class="fa-solid fa-plus"></i> Create Lesson
+            </a>
+        </div>
+    </header>
+
     <div class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-unite-gray-100"><tr><th class="text-left p-3">Lesson</th><th class="p-3">Type</th><th class="p-3">Duration</th><th class="p-3">Module</th><th class="p-3">Course</th><th class="p-3">Resources</th><th class="p-3">Actions</th></tr></thead>
-            <tbody>{% for lesson in lessons %}<tr class="border-t"><td class="p-3">{{ lesson.title }}</td><td class="p-3">{{ lesson.get_lesson_type_display }}</td><td class="p-3">{{ lesson.duration_minutes|default:"-" }}{% if lesson.duration_minutes %} min{% endif %}</td><td class="p-3">{{ lesson.module.title }}</td><td class="p-3">{{ lesson.module.course.title }}</td><td class="p-3">{{ lesson.resources.count }}</td><td class="p-3"><a class="text-unite-blue-500" href="{% url 'dashboard:edit-lesson' lesson.id %}">Edit</a> | <a class="text-error" href="{% url 'dashboard:delete-lesson' lesson.id %}">Delete</a></td></tr>{% empty %}<tr><td class="p-3" colspan="7">No lessons yet.</td></tr>{% endfor %}</tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[980px]">
+                <thead class="bg-unite-gray-100 text-unite-navy-500">
+                    <tr>
+                        <th class="text-left p-3 font-semibold">Lesson</th>
+                        <th class="text-left p-3 font-semibold">Type</th>
+                        <th class="text-left p-3 font-semibold">Duration</th>
+                        <th class="text-left p-3 font-semibold">Module</th>
+                        <th class="text-left p-3 font-semibold">Course</th>
+                        <th class="text-left p-3 font-semibold">Resources</th>
+                        <th class="text-left p-3 font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in lessons %}
+                        <tr class="border-t border-unite-gray-300">
+                            <td class="p-3 text-unite-navy-500 font-semibold">{{ lesson.title }}</td>
+                            <td class="p-3 text-unite-text-main">{{ lesson.get_lesson_type_display }}</td>
+                            <td class="p-3 text-unite-text-main">{{ lesson.duration_minutes|default:'-' }}{% if lesson.duration_minutes %} min{% endif %}</td>
+                            <td class="p-3 text-unite-text-main">{{ lesson.module.title }}</td>
+                            <td class="p-3 text-unite-text-main">{{ lesson.module.course.title }}</td>
+                            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">{{ lesson.resources.count }}</span></td>
+                            <td class="p-3">
+                                <div class="flex items-center gap-3">
+                                    <a class="text-unite-blue-500 hover:text-unite-blue-600 font-semibold" href="{% url 'dashboard:edit-lesson' lesson.id %}">Edit</a>
+                                    <a class="text-error hover:underline font-semibold" href="{% url 'dashboard:delete-lesson' lesson.id %}">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td class="p-5 text-unite-text-main" colspan="7">No lessons yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

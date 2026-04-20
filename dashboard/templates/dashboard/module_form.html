@@ -1,16 +1,26 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-10">
+<section class="max-w-3xl mx-auto px-4 py-8 lg:py-10 space-y-5">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Dashboard Form</p>
+        <h1 class="mt-1 text-2xl lg:text-3xl font-bold text-unite-navy-500">{{ title }}</h1>
+        <p class="mt-2 text-sm text-unite-text-main">Fill in the required fields, then save to apply changes.</p>
+    </header>
+
     <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-        <h1 class="text-2xl font-bold mb-5 text-unite-navy-500">{{ title }}</h1>
         <form method="post" class="space-y-4">
             {% csrf_token %}
             {% for field in form %}
                 {% include 'partials/form_field.html' with field=field %}
             {% endfor %}
-            <button class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold " type="submit" data-loading="1">Save</button>
+            <div class="pt-2 flex flex-wrap gap-3">
+                <button class="bg-unite-orange-500 hover:bg-unite-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold" type="submit" data-loading="1">
+                    Save Changes
+                </button>
+                <a class="bg-unite-gray-300 hover:bg-unite-gray-100 text-unite-text-main px-5 py-2.5 rounded-xl font-semibold" href="{% url 'dashboard:home' %}">Cancel</a>
+            </div>
         </form>
     </div>
-</div>
+</section>
 {% endblock %}

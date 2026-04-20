@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Confirm Delete{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-12">
-    <div class="bg-white border rounded-xl p-6">
-        <h1 class="text-xl font-bold">Confirm Delete</h1>
-        <p class="mt-2 text-unite-text-main">Are you sure you want to delete: <strong>{{ item }}</strong>?</p>
-        <form method="post" class="mt-5 flex gap-3">
+<section class="max-w-xl mx-auto px-4 py-10">
+    <div class="bg-white border border-error rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+            <div class="h-10 w-10 rounded-full bg-unite-orange-100 text-unite-orange-600 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-unite-navy-500">Confirm Delete</h1>
+                <p class="mt-2 text-unite-text-main">Are you sure you want to permanently delete <span class="font-semibold">{{ item }}</span>?</p>
+                <p class="mt-1 text-sm text-unite-text-main">This action cannot be undone.</p>
+            </div>
+        </div>
+        <form method="post" class="mt-6 flex flex-wrap gap-3">
             {% csrf_token %}
-            <button class="bg-error text-white px-4 py-2 rounded-lg" type="submit">Yes, Delete</button>
-            <a class="bg-unite-gray-300 px-4 py-2 rounded-lg" href="{% url back_url %}">Cancel</a>
+            <button class="bg-error text-white px-4 py-2.5 rounded-xl font-semibold" type="submit">Yes, Delete</button>
+            <a class="bg-unite-gray-300 hover:bg-unite-gray-100 text-unite-text-main px-4 py-2.5 rounded-xl font-semibold" href="{% url back_url %}">Cancel</a>
         </form>
     </div>
-</div>
+</section>
 {% endblock %}

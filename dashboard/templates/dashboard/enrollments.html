@@ -1,13 +1,44 @@
 {% extends 'base.html' %}
 {% block title %}Enrollments{% endblock %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <h1 class="text-2xl font-bold mb-5">Teacher Enrollments</h1>
-    <div class="bg-white border rounded-xl overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-unite-gray-100"><tr><th class="text-left p-3">Teacher</th><th class="p-3">Course</th><th class="p-3">Completed</th><th class="p-3">Date</th></tr></thead>
-            <tbody>{% for item in enrollments %}<tr class="border-t"><td class="p-3">{{ item.user.profile.full_name|default:item.user.username }}</td><td class="p-3">{{ item.course.title }}</td><td class="p-3">{{ item.is_completed }}</td><td class="p-3">{{ item.enrolled_at|date:"M d, Y" }}</td></tr>{% empty %}<tr><td class="p-3" colspan="4">No enrollments yet.</td></tr>{% endfor %}</tbody>
-        </table>
+<section class="max-w-7xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6 lg:p-7">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Dashboard</p>
+        <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">Teacher Enrollments</h1>
+        <p class="mt-2 text-unite-text-main">Monitor teacher enrollment activity and completion status per course.</p>
+    </header>
+
+    <div class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[760px]">
+                <thead class="bg-unite-gray-100 text-unite-navy-500">
+                    <tr>
+                        <th class="text-left p-3 font-semibold">Teacher</th>
+                        <th class="text-left p-3 font-semibold">Course</th>
+                        <th class="text-left p-3 font-semibold">Status</th>
+                        <th class="text-left p-3 font-semibold">Enrolled Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in enrollments %}
+                        <tr class="border-t border-unite-gray-300">
+                            <td class="p-3 text-unite-text-main">{{ item.user.profile.full_name|default:item.user.username }}</td>
+                            <td class="p-3 text-unite-navy-500 font-semibold">{{ item.course.title }}</td>
+                            <td class="p-3">
+                                {% if item.is_completed %}
+                                    <span class="text-xs px-2 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Completed</span>
+                                {% else %}
+                                    <span class="text-xs px-2 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600 font-semibold">In Progress</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 text-unite-text-main">{{ item.enrolled_at|date:"M d, Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td class="p-5 text-unite-text-main" colspan="4">No enrollments yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

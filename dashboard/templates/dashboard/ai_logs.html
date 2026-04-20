@@ -6,37 +6,76 @@
         <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Dashboard</p>
         <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">AI Tutor Usage Logs</h1>
         <p class="mt-2 text-unite-text-main">Review recent AI tutor sessions for audit, support, and quality assurance.</p>
+        <div class="mt-3 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Lesson groups: {{ lesson_group_count }}</span>
+            <span class="px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Sessions with messages: {{ sessions_with_messages_count }}</span>
+            <span class="px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Total messages: {{ total_messages_count }}</span>
+            <span class="px-2.5 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600 font-semibold">Sessions without messages: {{ empty_sessions_count }}</span>
+        </div>
     </header>
 
     <div class="space-y-4">
-        {% for session in sessions %}
+        {% for group in grouped_logs %}
             <article class="bg-white border border-unite-gray-300 rounded-2xl p-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                        <p class="font-semibold text-unite-navy-500">{{ session.user.username }} - {{ session.title|default:'Session' }}</p>
-                        <p class="text-sm text-unite-text-main mt-1">
-                            {% if session.lesson %}Lesson: {{ session.lesson.title }}
-                            {% elif session.course %}Course: {{ session.course.title }}
-                            {% else %}General Context{% endif %}
-                        </p>
+                        <p class="font-semibold text-xl text-unite-navy-500">Lesson: {{ group.lesson_label }}</p>
+                        <p class="text-sm text-unite-text-main mt-1">{{ group.context_label }}</p>
                     </div>
-                    <p class="text-sm text-unite-text-main">{{ session.updated_at|date:"M d, Y H:i" }}</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Teachers: {{ group.teacher_count }}</span>
+                        <span class="px-2.5 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600 font-semibold">Messages: {{ group.total_messages }}</span>
+                    </div>
                 </div>
-                <div class="mt-3 bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-3 max-h-56 overflow-y-auto text-sm space-y-2">
-                    {% for message in session.messages.all %}
-                        <p class="text-unite-text-main">
-                            <span class="font-semibold uppercase text-unite-navy-500">{{ message.role }}:</span>
-                            {{ message.message|truncatechars:220 }}
-                        </p>
-                    {% empty %}
-                        <p class="text-unite-text-main">No messages in this session.</p>
+
+                <div class="mt-4 space-y-3">
+                    {% for teacher in group.teachers %}
+                        <details class="border border-unite-gray-300 rounded-xl bg-unite-gray-100 group" {% if forloop.first %}open{% endif %}>
+                            <summary class="list-none cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <p class="font-semibold text-unite-navy-500">{{ teacher.teacher_name }}</p>
+                                    <p class="text-xs text-unite-text-main">@{{ teacher.username }}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs px-2 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Messages: {{ teacher.message_count }}</span>
+                                    <i class="fa-solid fa-chevron-down text-xs text-unite-text-main transition-transform group-open:rotate-180"></i>
+                                </div>
+                            </summary>
+
+                            <div class="px-3 pb-3 space-y-2">
+                                {% for session in teacher.sessions %}
+                                    <div class="bg-white border border-unite-gray-300 rounded-lg p-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <p class="text-sm font-semibold text-unite-navy-500">{{ session.title }}</p>
+                                            <p class="text-[11px] text-unite-text-main">{{ session.updated_at|date:"M d, Y H:i" }}</p>
+                                        </div>
+
+                                        <div class="mt-2 bg-unite-gray-100 border border-unite-gray-300 rounded-lg p-2.5 max-h-64 overflow-y-auto text-sm space-y-2">
+                                            {% for message in session.messages %}
+                                                <div class="text-unite-text-main border-b border-unite-gray-300 last:border-b-0 pb-2 last:pb-0">
+                                                    <p class="text-[11px] text-unite-text-main mb-1">
+                                                        <span class="font-semibold uppercase text-unite-navy-500">{{ message.role }}</span>
+                                                        <span class="mx-1">&bull;</span>
+                                                        {{ message.created_at|date:"M d, Y H:i" }}
+                                                    </p>
+                                                    <p>{{ message.message|truncatechars:500 }}</p>
+                                                </div>
+                                            {% empty %}
+                                                <p class="text-unite-text-main">No messages in this session.</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </details>
                     {% endfor %}
                 </div>
             </article>
         {% empty %}
             <div class="bg-white border border-dashed border-unite-gray-300 rounded-2xl p-8 text-center">
                 <i class="fa-regular fa-message text-2xl text-unite-blue-500"></i>
-                <p class="mt-2 text-unite-text-main">No AI logs yet.</p>
+                <p class="mt-2 text-unite-text-main">No chat messages found yet.</p>
+                <p class="mt-1 text-sm text-unite-text-main">Total sessions: {{ total_sessions_count }}. Most likely these sessions were opened but no message was sent.</p>
             </div>
         {% endfor %}
     </div>

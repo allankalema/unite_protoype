@@ -405,28 +405,40 @@
             event.preventDefault();
             const message = input.value.trim();
             if (!message) return;
-            appendMessage(message, true);
+            const currentDraft = message;
             input.value = "";
+            input.disabled = true;
+            const sendButton = document.getElementById("chat-send");
+            sendButton.disabled = true;
             loading.classList.remove("hidden");
 
             const formData = new FormData(form);
-            formData.set("message", message);
+            formData.set("message", currentDraft);
             try {
                 const response = await fetch("{% url 'ai_tutor:send' %}", {
                     method: "POST",
                     headers: { "X-Requested-With": "XMLHttpRequest" },
                     body: formData
                 });
-                const data = await response.json();
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    data = { error: "Unexpected response from server. Please try again." };
+                }
                 if (!response.ok) {
-                    appendMessage(data.error || "Unable to fetch response.", false, { typewriter: true });
+                    appendMessage(data.error || "Unable to save chat message.", false, { typewriter: true });
                 } else {
+                    appendMessage(data.user_message || currentDraft, true);
                     appendMessage(data.assistant_message || "No response generated.", false, { typewriter: true });
                 }
             } catch (error) {
-                appendMessage("Network issue. Please try again.", false, { typewriter: true });
+                appendMessage("Message was not saved due to a network issue. Please try again.", false, { typewriter: true });
             } finally {
                 loading.classList.add("hidden");
+                input.disabled = false;
+                sendButton.disabled = false;
+                input.focus();
             }
         });
     });

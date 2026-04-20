@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import staff_required
@@ -301,5 +302,99 @@ def enrollment_list_view(request):
 
 @staff_required
 def ai_logs_view(request):
-    sessions = ChatSession.objects.select_related("user", "course", "lesson").prefetch_related("messages")
-    return render(request, "dashboard/ai_logs.html", {"sessions": sessions})
+    sessions = (
+        ChatSession.objects.select_related("user", "course", "lesson")
+        .prefetch_related("messages")
+        .annotate(message_count=Count("messages"))
+        .order_by("-updated_at")
+    )
+    sessions_with_messages = sessions.filter(message_count__gt=0)
+    empty_sessions_count = sessions.filter(message_count=0).count()
+
+    lesson_groups = {}
+    total_messages_count = 0
+
+    for session in sessions_with_messages:
+        if session.lesson:
+            group_key = f"lesson-{session.lesson_id}"
+            lesson_label = session.lesson.title
+            context_label = f"Course: {session.course.title}" if session.course else "Lesson Context"
+        elif session.course:
+            group_key = f"course-{session.course_id}"
+            lesson_label = "Course-Level Chat"
+            context_label = f"Course: {session.course.title}"
+        else:
+            group_key = "general"
+            lesson_label = "General AI Tutor Context"
+            context_label = "No specific lesson or course"
+
+        if group_key not in lesson_groups:
+            lesson_groups[group_key] = {
+                "lesson_label": lesson_label,
+                "context_label": context_label,
+                "teachers": {},
+                "total_messages": 0,
+            }
+
+        teacher_profile = getattr(session.user, "profile", None)
+        teacher_name = (
+            teacher_profile.full_name if teacher_profile and teacher_profile.full_name else session.user.username
+        )
+        teacher_key = session.user_id
+        group = lesson_groups[group_key]
+
+        if teacher_key not in group["teachers"]:
+            group["teachers"][teacher_key] = {
+                "teacher_name": teacher_name,
+                "username": session.user.username,
+                "sessions": [],
+                "message_count": 0,
+                "latest_at": session.updated_at,
+            }
+
+        messages = list(session.messages.all())
+        message_count = len(messages)
+        group["teachers"][teacher_key]["sessions"].append(
+            {
+                "title": session.title or "Session",
+                "updated_at": session.updated_at,
+                "messages": messages,
+                "message_count": message_count,
+            }
+        )
+        group["teachers"][teacher_key]["message_count"] += message_count
+        if session.updated_at > group["teachers"][teacher_key]["latest_at"]:
+            group["teachers"][teacher_key]["latest_at"] = session.updated_at
+
+        group["total_messages"] += message_count
+        total_messages_count += message_count
+
+    grouped_logs = []
+    for entry in lesson_groups.values():
+        teachers = sorted(
+            entry["teachers"].values(),
+            key=lambda row: row["latest_at"],
+            reverse=True,
+        )
+        grouped_logs.append(
+            {
+                "lesson_label": entry["lesson_label"],
+                "context_label": entry["context_label"],
+                "teachers": teachers,
+                "teacher_count": len(teachers),
+                "total_messages": entry["total_messages"],
+            }
+        )
+
+    return render(
+        request,
+        "dashboard/ai_logs.html",
+        {
+            "grouped_logs": grouped_logs,
+            "empty_sessions_count": empty_sessions_count,
+            "total_sessions_count": sessions.count(),
+            "sessions_with_messages_count": sessions_with_messages.count(),
+            "lesson_group_count": len(grouped_logs),
+            "total_messages_count": total_messages_count,
+        },
+    )

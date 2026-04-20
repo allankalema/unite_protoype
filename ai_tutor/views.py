@@ -123,8 +123,26 @@ def ai_send_message_view(request):
 
 @login_required
 def chat_history_view(request):
-    sessions = ChatSession.objects.filter(user=request.user).select_related("course", "lesson")
-    return render(request, "ai_tutor/history.html", {"sessions": sessions})
+    sessions = list(ChatSession.objects.filter(user=request.user).select_related("course", "lesson"))
+    active_session = None
+    session_id = request.GET.get("session_id")
+
+    if session_id:
+        active_session = next((s for s in sessions if str(s.id) == str(session_id)), None)
+    if not active_session and sessions:
+        active_session = sessions[0]
+
+    messages_list = active_session.messages.all() if active_session else []
+    return render(
+        request,
+        "ai_tutor/history.html",
+        {
+            "sessions": sessions,
+            "active_session": active_session,
+            "messages_list": messages_list,
+            "chat_form": AIChatForm(),
+        },
+    )
 
 
 @login_required

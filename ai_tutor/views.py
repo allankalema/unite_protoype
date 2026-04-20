@@ -78,6 +78,12 @@ def ai_send_message_view(request):
         id=session_id,
         user=request.user,
     )
+    lesson_id = request.POST.get("lesson_id")
+    if lesson_id and session.lesson_id and str(session.lesson_id) != str(lesson_id):
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"error": "Chat session does not match the current lesson."}, status=400)
+        messages.error(request, "Chat session does not match the current lesson.")
+        return redirect("courses:lesson-detail", lesson_id=lesson_id)
 
     form = AIChatForm(request.POST)
     if not form.is_valid():
@@ -119,3 +125,13 @@ def ai_send_message_view(request):
 def chat_history_view(request):
     sessions = ChatSession.objects.filter(user=request.user).select_related("course", "lesson")
     return render(request, "ai_tutor/history.html", {"sessions": sessions})
+
+
+@login_required
+def clear_session_view(request, session_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required."}, status=405)
+
+    session = get_object_or_404(ChatSession, id=session_id, user=request.user)
+    session.delete()
+    return JsonResponse({"ok": True})

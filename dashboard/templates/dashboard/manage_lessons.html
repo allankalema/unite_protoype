@@ -13,6 +13,12 @@
                 <i class="fa-solid fa-plus"></i> Create Lesson
             </a>
         </div>
+        <div class="mt-4">
+            <div class="relative max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-unite-text-main text-xs"></i>
+                <input id="table-search" type="text" placeholder="Search by lesson, module, or course..." class="pl-9">
+            </div>
+        </div>
     </header>
 
     <div class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden">
@@ -23,34 +29,57 @@
                         <th class="text-left p-3 font-semibold">Lesson</th>
                         <th class="text-left p-3 font-semibold">Type</th>
                         <th class="text-left p-3 font-semibold">Duration</th>
+                        <th class="text-left p-3 font-semibold">Order</th>
                         <th class="text-left p-3 font-semibold">Module</th>
                         <th class="text-left p-3 font-semibold">Course</th>
                         <th class="text-left p-3 font-semibold">Resources</th>
                         <th class="text-left p-3 font-semibold">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="table-body">
                     {% for lesson in lessons %}
-                        <tr class="border-t border-unite-gray-300">
+                        <tr class="border-t border-unite-gray-300 hover:bg-unite-blue-100 transition cursor-pointer" data-row-url="{% url 'dashboard:lesson-detail' lesson.id %}">
                             <td class="p-3 text-unite-navy-500 font-semibold">{{ lesson.title }}</td>
                             <td class="p-3 text-unite-text-main">{{ lesson.get_lesson_type_display }}</td>
-                            <td class="p-3 text-unite-text-main">{{ lesson.duration_minutes|default:'-' }}{% if lesson.duration_minutes %} min{% endif %}</td>
+                            <td class="p-3 text-unite-text-main">{% if lesson.duration_minutes %}{{ lesson.duration_minutes }} min{% else %}<span class="text-unite-orange-600 font-medium">Not set</span>{% endif %}</td>
+                            <td class="p-3 text-unite-text-main">{{ lesson.order }}</td>
                             <td class="p-3 text-unite-text-main">{{ lesson.module.title }}</td>
                             <td class="p-3 text-unite-text-main">{{ lesson.module.course.title }}</td>
                             <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">{{ lesson.resources.count }}</span></td>
                             <td class="p-3">
                                 <div class="flex items-center gap-3">
-                                    <a class="text-unite-blue-500 hover:text-unite-blue-600 font-semibold" href="{% url 'dashboard:edit-lesson' lesson.id %}">Edit</a>
-                                    <a class="text-error hover:underline font-semibold" href="{% url 'dashboard:delete-lesson' lesson.id %}">Delete</a>
+                                    <a class="text-unite-blue-500 hover:text-unite-blue-600 font-semibold row-action" href="{% url 'dashboard:edit-lesson' lesson.id %}">Edit</a>
+                                    <a class="text-error hover:underline font-semibold row-action" href="{% url 'dashboard:delete-lesson' lesson.id %}">Delete</a>
                                 </div>
                             </td>
                         </tr>
                     {% empty %}
-                        <tr><td class="p-5 text-unite-text-main" colspan="7">No lessons yet.</td></tr>
+                        <tr><td class="p-5 text-unite-text-main" colspan="8">No lessons yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </section>
+
+<script>
+(function () {
+    const searchInput = document.getElementById('table-search');
+    const rows = Array.from(document.querySelectorAll('#table-body tr[data-row-url]'));
+    rows.forEach(function (row) {
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('.row-action')) return;
+            const url = row.getAttribute('data-row-url');
+            if (url) window.location.href = url;
+        });
+    });
+    if (!searchInput) return;
+    searchInput.addEventListener('input', function () {
+        const q = searchInput.value.trim().toLowerCase();
+        rows.forEach(function (row) {
+            row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+})();
+</script>
 {% endblock %}

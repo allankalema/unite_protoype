@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Enrollment Detail (Admin){% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Enrollment Record</p>
+        <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">{{ enrollment.user.profile.full_name|default:enrollment.user.username }}</h1>
+        <p class="mt-2 text-unite-text-main">Course: {{ enrollment.course.title }}</p>
+    </header>
+
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6 grid sm:grid-cols-2 gap-4 text-sm">
+        <div><p class="text-unite-text-main">Username</p><p class="font-semibold text-unite-navy-500">{{ enrollment.user.username }}</p></div>
+        <div><p class="text-unite-text-main">Email</p><p class="font-semibold text-unite-navy-500">{{ enrollment.user.email|default:'-' }}</p></div>
+        <div><p class="text-unite-text-main">Status</p><p class="font-semibold text-unite-navy-500">{% if enrollment.is_completed %}Completed{% else %}In Progress{% endif %}</p></div>
+        <div><p class="text-unite-text-main">Enrolled At</p><p class="font-semibold text-unite-navy-500">{{ enrollment.enrolled_at|date:"M d, Y H:i" }}</p></div>
+        <div><p class="text-unite-text-main">Completed At</p><p class="font-semibold text-unite-navy-500">{% if enrollment.completed_at %}{{ enrollment.completed_at|date:"M d, Y H:i" }}{% else %}-{% endif %}</p></div>
+    </article>
+
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'courses:detail' enrollment.course.slug %}" class="px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Open Course Page</a>
+        <a href="{% url 'dashboard:enrollments' %}" class="px-4 py-2.5 rounded-xl bg-unite-gray-300 text-unite-text-main font-semibold">Back</a>
+    </div>
+</section>
+{% endblock %}

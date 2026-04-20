@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Module Detail (Admin){% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Module Record</p>
+        <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">{{ module.title }}</h1>
+        <p class="mt-2 text-unite-text-main">Course: {{ module.course.title }}</p>
+    </header>
+
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6 grid sm:grid-cols-2 gap-4 text-sm">
+        <div><p class="text-unite-text-main">Order</p><p class="font-semibold text-unite-navy-500">{{ module.order }}</p></div>
+        <div><p class="text-unite-text-main">Lessons</p><p class="font-semibold text-unite-navy-500">{{ module.lessons.count }}</p></div>
+        <div class="sm:col-span-2"><p class="text-unite-text-main">Description</p><p class="font-semibold text-unite-navy-500 whitespace-pre-line">{{ module.description|default:'No description provided.' }}</p></div>
+    </article>
+
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'dashboard:edit-module' module.id %}" class="px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Edit Module</a>
+        <a href="{% url 'dashboard:delete-module' module.id %}" class="px-4 py-2.5 rounded-xl bg-error text-white font-semibold">Delete Module</a>
+        <a href="{% url 'dashboard:manage-modules' %}" class="px-4 py-2.5 rounded-xl bg-unite-gray-300 text-unite-text-main font-semibold">Back</a>
+    </div>
+</section>
+{% endblock %}

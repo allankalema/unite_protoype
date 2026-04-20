@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Resource Detail (Admin){% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Resource Record</p>
+        <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">{{ resource.title }}</h1>
+        <p class="mt-2 text-unite-text-main">{{ resource.lesson.module.course.title }} • {{ resource.lesson.module.title }} • {{ resource.lesson.title }}</p>
+    </header>
+
+    <article class="bg-white border border-unite-gray-300 rounded-2xl p-6 grid sm:grid-cols-2 gap-4 text-sm">
+        <div><p class="text-unite-text-main">Type</p><p class="font-semibold text-unite-navy-500 uppercase">{{ resource.resource_type }}</p></div>
+        <div><p class="text-unite-text-main">Created</p><p class="font-semibold text-unite-navy-500">{{ resource.created_at|date:"M d, Y H:i" }}</p></div>
+        <div class="sm:col-span-2"><p class="text-unite-text-main">File URL</p><p class="font-semibold text-unite-blue-500 break-all">{{ resource.file_url }}</p></div>
+    </article>
+
+    <div class="flex flex-wrap gap-3">
+        <a href="{{ resource.file_url }}" target="_blank" class="px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Open Resource</a>
+        <a href="{% url 'dashboard:edit-resource' resource.id %}" class="px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Edit Resource</a>
+        <a href="{% url 'dashboard:delete-resource' resource.id %}" class="px-4 py-2.5 rounded-xl bg-error text-white font-semibold">Delete Resource</a>
+        <a href="{% url 'dashboard:manage-resources' %}" class="px-4 py-2.5 rounded-xl bg-unite-gray-300 text-unite-text-main font-semibold">Back</a>
+    </div>
+</section>
+{% endblock %}

@@ -48,6 +48,15 @@ def manage_courses_view(request):
 
 
 @staff_required
+def course_detail_admin_view(request, course_id):
+    course = get_object_or_404(
+        Course.objects.select_related("created_by", "created_by__profile").prefetch_related("modules", "quizzes"),
+        id=course_id,
+    )
+    return render(request, "dashboard/course_detail.html", {"course": course})
+
+
+@staff_required
 def create_course_view(request):
     if request.method == "POST":
         form = CourseForm(request.POST)
@@ -91,6 +100,15 @@ def manage_modules_view(request):
 
 
 @staff_required
+def module_detail_admin_view(request, module_id):
+    module = get_object_or_404(
+        Module.objects.select_related("course", "course__created_by", "course__created_by__profile").prefetch_related("lessons"),
+        id=module_id,
+    )
+    return render(request, "dashboard/module_detail.html", {"module": module})
+
+
+@staff_required
 def create_module_view(request):
     if request.method == "POST":
         form = ModuleForm(request.POST)
@@ -131,6 +149,15 @@ def delete_module_view(request, module_id):
 def manage_lessons_view(request):
     lessons = Lesson.objects.select_related("module", "module__course").prefetch_related("resources")
     return render(request, "dashboard/manage_lessons.html", {"lessons": lessons})
+
+
+@staff_required
+def lesson_detail_admin_view(request, lesson_id):
+    lesson = get_object_or_404(
+        Lesson.objects.select_related("module", "module__course").prefetch_related("resources"),
+        id=lesson_id,
+    )
+    return render(request, "dashboard/lesson_detail.html", {"lesson": lesson})
 
 
 @staff_required
@@ -195,6 +222,15 @@ def edit_lesson_resource_view(request, resource_id):
     else:
         form = LessonResourceForm(instance=resource)
     return render(request, "dashboard/resource_form.html", {"form": form, "title": "Edit Lesson Resource"})
+
+
+@staff_required
+def resource_detail_admin_view(request, resource_id):
+    resource = get_object_or_404(
+        LessonResource.objects.select_related("lesson", "lesson__module", "lesson__module__course"),
+        id=resource_id,
+    )
+    return render(request, "dashboard/resource_detail.html", {"resource": resource})
 
 
 @staff_required
@@ -298,6 +334,15 @@ def delete_question_view(request, question_id):
 def enrollment_list_view(request):
     enrollments = Enrollment.objects.select_related("user", "course").all()
     return render(request, "dashboard/enrollments.html", {"enrollments": enrollments})
+
+
+@staff_required
+def enrollment_detail_admin_view(request, enrollment_id):
+    enrollment = get_object_or_404(
+        Enrollment.objects.select_related("user", "user__profile", "course"),
+        id=enrollment_id,
+    )
+    return render(request, "dashboard/enrollment_detail.html", {"enrollment": enrollment})
 
 
 @staff_required

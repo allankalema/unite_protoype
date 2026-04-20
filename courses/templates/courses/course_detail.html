@@ -1,63 +1,131 @@
 {% extends 'base.html' %}
 {% block title %}{{ course.title }} | Course{% endblock %}
 {% block content %}
-<section class="max-w-6xl mx-auto px-4 py-10 space-y-6">
-    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-            {% if course.category %}<span class="px-2 py-1 rounded-full bg-unite-gray-100 text-unite-text-main">{{ course.category }}</span>{% endif %}
-            <span class="px-2 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600">{{ course.get_level_display }}</span>
-            <span class="px-2 py-1 rounded-full bg-unite-gray-100 text-unite-text-main">Passing Score {{ course.passing_score }}%</span>
-        </div>
-        <h1 class="text-3xl font-bold text-unite-navy-500 mt-4">{{ course.title }}</h1>
-        <p class="mt-2 text-unite-text-main max-w-3xl">{{ course.short_description }}</p>
+<section class="max-w-7xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-3xl overflow-hidden">
+        <div class="bg-unite-blue-100 p-6 lg:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-5">
+                <div class="max-w-3xl">
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        {% if course.category %}
+                            <span class="px-2.5 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">{{ course.category }}</span>
+                        {% endif %}
+                        <span class="px-2.5 py-1 rounded-full bg-unite-orange-100 border border-unite-gray-300 text-unite-orange-600">{{ course.get_level_display }}</span>
+                        <span class="px-2.5 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">Passing Score {{ course.passing_score }}%</span>
+                    </div>
 
-        <div class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300"><p class="text-unite-text-main">Duration</p><p class="font-semibold">{{ course.estimated_duration_hours }} hours</p></div>
-            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300"><p class="text-unite-text-main">Instructor</p><p class="font-semibold">{{ instructor_name }}</p></div>
-            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300"><p class="text-unite-text-main">Institution</p><p class="font-semibold">{{ institution_name }}</p></div>
-            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300"><p class="text-unite-text-main">Modules</p><p class="font-semibold">{{ course.modules.all|length }}</p></div>
-        </div>
+                    <h1 class="text-3xl lg:text-4xl font-bold text-unite-navy-500 mt-4">{{ course.title }}</h1>
+                    <p class="mt-3 text-unite-text-main leading-7">{{ course.short_description }}</p>
 
-        {% if user_progress != None %}
-            <div class="mt-5">
-                <div class="flex justify-between text-sm">
-                    <p class="text-unite-text-main">Your Progress</p>
-                    <p class="font-semibold text-unite-navy-500">{{ user_progress }}%</p>
+                    <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                        <span class="px-3 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">Instructor: {{ instructor_name }}</span>
+                        <span class="px-3 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">{{ institution_name }}</span>
+                        <span class="px-3 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">Duration: {{ course.estimated_duration_hours }} hours</span>
+                        <span class="px-3 py-1 rounded-full bg-white border border-unite-gray-300 text-unite-text-main">{{ course.modules.all|length }} modules</span>
+                    </div>
                 </div>
-                <div class="mt-2 h-3 rounded-full bg-unite-gray-300 overflow-hidden">
-                    <div class="h-3 rounded-full bg-unite-blue-500" style="width: {{ user_progress }}%"></div>
+
+                <div class="bg-white border border-unite-gray-300 rounded-2xl p-4 min-w-[250px]">
+                    <p class="text-xs uppercase tracking-wide text-unite-text-main">Enrollment Action</p>
+                    <div class="mt-3">
+                        {% if request.user.is_authenticated %}
+                            {% if is_enrolled %}
+                                <a href="{% url 'courses:learn' course.slug %}" class="inline-flex w-full justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold">Continue Learning <i class="fa-solid fa-arrow-right"></i></a>
+                            {% else %}
+                                <a href="{% url 'courses:enroll' course.slug %}" class="inline-flex w-full justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold">Enroll in Course <i class="fa-solid fa-user-plus"></i></a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="inline-flex w-full justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold">Login to Enroll</a>
+                        {% endif %}
+                    </div>
+
+                    {% if user_progress != None %}
+                        <div class="mt-4 border-t border-unite-gray-300 pt-4">
+                            <div class="flex justify-between text-sm">
+                                <p class="text-unite-text-main">Your Progress</p>
+                                <p class="font-semibold text-unite-navy-500">{{ user_progress }}%</p>
+                            </div>
+                            <div class="mt-2 h-2.5 rounded-full bg-unite-gray-300 overflow-hidden">
+                                <div class="h-2.5 rounded-full bg-unite-orange-500" style="width: {{ user_progress }}%"></div>
+                            </div>
+                            <p class="text-xs text-unite-text-main mt-2">Average quiz score: {{ average_score }}%</p>
+                        </div>
+                    {% endif %}
                 </div>
-                <p class="text-sm text-unite-text-main mt-2">Average quiz score: <span class="font-semibold">{{ average_score }}%</span></p>
             </div>
-        {% endif %}
+        </div>
 
-        <div class="mt-6">
-            {% if request.user.is_authenticated %}
-                {% if is_enrolled %}
-                    <a href="{% url 'courses:learn' course.slug %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-unite-blue-500 hover:bg-unite-blue-600 text-white font-semibold ">Continue Learning <i class="fa-solid fa-arrow-right"></i></a>
-                {% else %}
-                    <a href="{% url 'courses:enroll' course.slug %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold ">Enroll in Course <i class="fa-solid fa-user-plus"></i></a>
-                {% endif %}
-            {% else %}
-                <a href="{% url 'accounts:login' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold ">Login to Enroll</a>
-            {% endif %}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 lg:p-5 bg-white">
+            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Duration</p>
+                <p class="font-semibold text-unite-navy-500 mt-1">{{ course.estimated_duration_hours }} hours</p>
+            </div>
+            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Instructor</p>
+                <p class="font-semibold text-unite-navy-500 mt-1">{{ instructor_name }}</p>
+            </div>
+            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Institution</p>
+                <p class="font-semibold text-unite-navy-500 mt-1">{{ institution_name }}</p>
+            </div>
+            <div class="p-3 rounded-xl bg-unite-gray-100 border border-unite-gray-300">
+                <p class="text-xs uppercase tracking-wide text-unite-text-main">Modules</p>
+                <p class="font-semibold text-unite-navy-500 mt-1">{{ course.modules.all|length }}</p>
+            </div>
         </div>
     </header>
 
-    <div class="grid lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
+    <div class="grid lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 space-y-6">
             <article class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-                <h2 class="text-xl font-semibold text-unite-navy-500">Overview</h2>
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl font-semibold text-unite-navy-500">Overview</h2>
+                    <i class="fa-regular fa-file-lines text-unite-blue-500"></i>
+                </div>
                 <p class="mt-3 whitespace-pre-line leading-7 text-unite-text-main">{{ course.description }}</p>
             </article>
 
             <article class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-                <h2 class="text-xl font-semibold text-unite-navy-500">Learning Objectives</h2>
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl font-semibold text-unite-navy-500">Learning Objectives</h2>
+                    <i class="fa-solid fa-bullseye text-unite-orange-500"></i>
+                </div>
                 <p class="mt-3 whitespace-pre-line leading-7 text-unite-text-main">{{ course.learning_objectives|default:"Learning objectives will be added by course staff." }}</p>
             </article>
+
+            <section class="bg-white border border-unite-gray-300 rounded-2xl p-6">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-xl font-semibold text-unite-navy-500">Modules and Lessons</h2>
+                    <span class="text-xs px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600">{{ course.modules.all|length }} Modules</span>
+                </div>
+                <div class="mt-4 space-y-3">
+                    {% for module in course.modules.all %}
+                        <details class="border border-unite-gray-300 rounded-xl bg-unite-gray-100 group" {% if forloop.first %}open{% endif %}>
+                            <summary class="list-none cursor-pointer px-4 py-3 flex justify-between items-center rounded-xl">
+                                <span class="font-semibold text-unite-navy-500">Module {{ module.order }}: {{ module.title }}</span>
+                                <i class="fa-solid fa-chevron-down text-unite-text-main group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="px-3 pb-3 space-y-2">
+                                {% for lesson in module.lessons.all %}
+                                    <div class="text-sm text-unite-text-main p-3 rounded-lg border border-unite-gray-300 bg-white flex items-center justify-between gap-2">
+                                        <span class="font-medium">{{ lesson.title }}</span>
+                                        <span class="text-xs px-2 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600">{{ lesson.get_lesson_type_display }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-sm text-unite-text-main p-3 rounded-lg border border-dashed border-unite-gray-300 bg-white">No lessons in this module yet.</p>
+                                {% endfor %}
+                            </div>
+                        </details>
+                    {% empty %}
+                        <div class="border border-dashed border-unite-gray-300 rounded-xl p-6 text-center text-sm text-unite-text-main bg-unite-gray-100">
+                            Modules have not been configured for this course yet.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
         </div>
 
-        <aside class="space-y-6">
+        <aside class="lg:col-span-4 space-y-6">
             <div class="bg-white border border-unite-gray-300 rounded-2xl p-5">
                 <h3 class="font-semibold text-unite-navy-500">Prerequisites</h3>
                 <p class="mt-2 text-sm text-unite-text-main whitespace-pre-line">{{ course.prerequisites|default:"No prerequisites required." }}</p>
@@ -66,35 +134,11 @@
                 <h3 class="font-semibold text-unite-navy-500">Target Audience</h3>
                 <p class="mt-2 text-sm text-unite-text-main whitespace-pre-line">{{ course.target_audience|default:"Teachers in ongoing professional development programs." }}</p>
             </div>
+            <div class="bg-white border border-unite-gray-300 rounded-2xl p-5 bg-unite-blue-100">
+                <h3 class="font-semibold text-unite-navy-500">Need Support?</h3>
+                <p class="mt-2 text-sm text-unite-text-main">After enrollment, open any lesson and use the AI Tutor for guided, lesson-specific support.</p>
+            </div>
         </aside>
     </div>
-
-    <section class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-unite-navy-500">Modules and Lessons</h2>
-        <div class="mt-4 space-y-3">
-            {% for module in course.modules.all %}
-                <details class="border border-unite-gray-300 rounded-xl group">
-                    <summary class="list-none cursor-pointer px-4 py-3 flex justify-between items-center bg-unite-gray-100 rounded-xl">
-                        <span class="font-semibold text-unite-navy-500">Module {{ module.order }}: {{ module.title }}</span>
-                        <i class="fa-solid fa-chevron-down text-unite-text-main group-open:rotate-180 transition-transform"></i>
-                    </summary>
-                    <div class="px-4 py-3 space-y-2">
-                        {% for lesson in module.lessons.all %}
-                            <div class="text-sm text-unite-text-main p-2 rounded-lg hover:bg-unite-gray-100">
-                                <span class="font-medium">{{ lesson.title }}</span>
-                                <span class="text-unite-text-main ml-2">({{ lesson.get_lesson_type_display }})</span>
-                            </div>
-                        {% empty %}
-                            <p class="text-sm text-unite-text-main">No lessons in this module yet.</p>
-                        {% endfor %}
-                    </div>
-                </details>
-            {% empty %}
-                <div class="border border-dashed border-unite-gray-300 rounded-xl p-6 text-center text-sm text-unite-text-main">
-                    Modules have not been configured for this course yet.
-                </div>
-            {% endfor %}
-        </div>
-    </section>
 </section>
 {% endblock %}

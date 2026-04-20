@@ -17,54 +17,204 @@
         padding: 0.1rem 0.3rem;
         background: #F5F5F5;
     }
+    #chat-shell {
+        height: calc(100vh - 13rem);
+        min-height: 540px;
+    }
+    #chat-input {
+        min-height: 56px;
+        max-height: 180px;
+        line-height: 1.45;
+        font-size: 0.95rem;
+        border-radius: 0.85rem;
+        border: 1px solid #DDDDDD;
+        padding: 0.7rem 0.85rem;
+        color: #333333;
+        resize: vertical;
+    }
+    #chat-input::placeholder {
+        color: #333333;
+        opacity: 0.65;
+    }
 </style>
 {% endblock %}
 {% block content %}
-<section class="max-w-5xl mx-auto px-4 py-10">
-    <div class="bg-white border border-unite-gray-300 rounded-2xl p-6">
-        <h1 class="text-2xl font-bold text-unite-navy-500">AI Tutor</h1>
-        <p class="text-unite-text-main mt-1">
-            {% if lesson %}Lesson context: {{ lesson.title }}{% elif course %}Course context: {{ course.title }}{% else %}General teacher training support{% endif %}
-        </p>
+<section class="max-w-5xl mx-auto px-4 py-5 lg:py-6">
+    <div id="chat-shell" class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden flex flex-col">
+        <header class="px-5 py-4 border-b border-unite-gray-300 bg-unite-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-xl font-bold text-unite-navy-500">AI Tutor</h1>
+                    <p class="text-xs text-unite-text-main mt-1">{% if lesson %}Lesson: {{ lesson.title }}{% elif course %}Course: {{ course.title }}{% else %}General teacher training support{% endif %}</p>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2.5 py-1 rounded-full bg-unite-blue-100 text-unite-blue-600 font-semibold">Session: {{ session.id }}</span>
+                    {% if lesson %}<span class="px-2.5 py-1 rounded-full bg-unite-orange-100 text-unite-orange-600 font-semibold">Lesson Context</span>{% endif %}
+                </div>
+            </div>
+        </header>
 
-        <div id="chat-messages" class="mt-6 space-y-3 max-h-[460px] overflow-y-auto pr-1">
+        <main id="chat-messages" class="flex-1 overflow-y-auto px-5 py-4 space-y-5 bg-white">
             {% for msg in messages_list %}
-                <div class="{% if msg.role == 'user' %}text-right{% endif %}">
-                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-xl text-sm {% if msg.role == 'user' %}bg-unite-blue-500 text-white{% else %}bg-unite-gray-100 text-unite-text-main{% endif %}">
-                        <p class="text-[11px] mb-1 opacity-70 uppercase">{{ msg.role }}</p>
-                        <div class="ai-md" data-md="{{ msg.message|escapejs }}"></div>
+                <div class="{% if msg.role == 'user' %}flex justify-end{% else %}flex justify-start{% endif %}">
+                    <div class="max-w-[88%]">
+                        <div class="text-[11px] mb-1 {% if msg.role == 'user' %}text-right{% endif %} text-unite-text-main uppercase font-semibold tracking-wide">
+                            {% if msg.role == 'user' %}You{% elif msg.role == 'assistant' %}AI Tutor{% else %}System{% endif %}
+                        </div>
+                        <div class="rounded-2xl px-4 py-3 text-sm {% if msg.role == 'user' %}bg-unite-blue-500 text-white{% else %}bg-unite-gray-100 text-unite-text-main border border-unite-gray-300{% endif %}">
+                            <div class="ai-md" data-md="{{ msg.message|escapejs }}"></div>
+                        </div>
                     </div>
                 </div>
             {% empty %}
-                <div class="text-center py-10 text-unite-text-main">
-                    <i class="fa-regular fa-comments text-3xl"></i>
-                    <p class="mt-2 text-sm">No messages yet. Ask your first question.</p>
+                <div class="h-full flex items-center justify-center text-center">
+                    <div>
+                        <div class="mx-auto h-14 w-14 rounded-full bg-unite-blue-100 text-unite-blue-600 flex items-center justify-center">
+                            <i class="fa-solid fa-robot text-xl"></i>
+                        </div>
+                        <h2 class="mt-3 text-lg font-semibold text-unite-navy-500">How can I help you today?</h2>
+                        <p class="mt-1 text-sm text-unite-text-main">Ask a teaching question and I will respond with step-by-step guidance.</p>
+                    </div>
                 </div>
             {% endfor %}
-        </div>
+        </main>
 
-        <form id="chat-form" method="post" action="{% url 'ai_tutor:send' %}" class="mt-5 space-y-3">
-            {% csrf_token %}
-            <input type="hidden" name="session_id" value="{{ session.id }}">
-            <div class="grid gap-3">
-                {% for field in chat_form %}
-                    {% include 'partials/form_field.html' with field=field %}
-                {% endfor %}
-            </div>
-            <button type="submit" data-loading="1" class="px-5 py-2.5 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white font-semibold ">Send Message</button>
-        </form>
+        <footer class="border-t border-unite-gray-300 bg-white px-4 py-4">
+            <div id="chat-error" class="hidden mb-2 text-xs text-error"></div>
+            <form id="chat-form" class="space-y-2">
+                {% csrf_token %}
+                <input type="hidden" name="session_id" value="{{ session.id }}">
+                <div class="flex items-end gap-2">
+                    <textarea name="message" id="chat-input" rows="2" maxlength="2000" class="flex-1" placeholder="Message AI Tutor..."></textarea>
+                    <button id="chat-send" type="submit" class="h-11 w-11 rounded-xl bg-unite-orange-500 hover:bg-unite-orange-600 text-white shrink-0">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="text-[11px] text-unite-text-main">Press <span class="font-semibold">Enter</span> to send. Press <span class="font-semibold">Ctrl+Enter</span> for a new line.</p>
+            </form>
+        </footer>
     </div>
 </section>
 {% endblock %}
 {% block extra_scripts %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const blocks = document.querySelectorAll("[data-md]");
-        blocks.forEach(function (block) {
-            const raw = block.getAttribute("data-md") || "";
-            const html = marked.parse(raw);
-            block.innerHTML = DOMPurify.sanitize(html);
-            block.removeAttribute("data-md");
+        const messagesWrap = document.getElementById("chat-messages");
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("chat-input");
+        const sendButton = document.getElementById("chat-send");
+        const errorBox = document.getElementById("chat-error");
+
+        function renderMarkdownInNode(node) {
+            const blocks = node.querySelectorAll("[data-md]");
+            blocks.forEach(function (block) {
+                const raw = block.getAttribute("data-md") || "";
+                const html = marked.parse(raw);
+                block.innerHTML = DOMPurify.sanitize(html);
+                block.removeAttribute("data-md");
+            });
+        }
+
+        function appendMessage(text, role) {
+            const row = document.createElement("div");
+            row.className = role === "user" ? "flex justify-end" : "flex justify-start";
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "max-w-[88%]";
+
+            const label = document.createElement("div");
+            label.className = "text-[11px] mb-1 text-unite-text-main uppercase font-semibold tracking-wide" + (role === "user" ? " text-right" : "");
+            label.textContent = role === "user" ? "You" : "AI Tutor";
+
+            const bubble = document.createElement("div");
+            bubble.className = "rounded-2xl px-4 py-3 text-sm " + (role === "user" ? "bg-unite-blue-500 text-white" : "bg-unite-gray-100 text-unite-text-main border border-unite-gray-300");
+
+            const body = document.createElement("div");
+            body.className = "ai-md";
+            body.setAttribute("data-md", text || "");
+
+            bubble.appendChild(body);
+            wrapper.appendChild(label);
+            wrapper.appendChild(bubble);
+            row.appendChild(wrapper);
+            messagesWrap.appendChild(row);
+            renderMarkdownInNode(row);
+            messagesWrap.scrollTop = messagesWrap.scrollHeight;
+        }
+
+        function setSending(isSending) {
+            input.disabled = isSending;
+            sendButton.disabled = isSending;
+            sendButton.classList.toggle("opacity-70", isSending);
+        }
+
+        function showError(text) {
+            errorBox.textContent = text;
+            errorBox.classList.remove("hidden");
+        }
+
+        function clearError() {
+            errorBox.classList.add("hidden");
+            errorBox.textContent = "";
+        }
+
+        renderMarkdownInNode(document);
+        messagesWrap.scrollTop = messagesWrap.scrollHeight;
+
+        input.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter") return;
+
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const original = input.value;
+                input.value = original.slice(0, start) + "\n" + original.slice(end);
+                input.selectionStart = input.selectionEnd = start + 1;
+                return;
+            }
+
+            event.preventDefault();
+            form.requestSubmit();
+        });
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            clearError();
+            const message = input.value.trim();
+            if (!message) return;
+
+            setSending(true);
+            const formData = new FormData(form);
+            formData.set("message", message);
+
+            try {
+                const response = await fetch("{% url 'ai_tutor:send' %}", {
+                    method: "POST",
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                    body: formData,
+                });
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = { error: "Unexpected server response." };
+                }
+
+                if (!response.ok) {
+                    showError(data.error || "Unable to send message.");
+                    return;
+                }
+
+                appendMessage(data.user_message || message, "user");
+                appendMessage(data.assistant_message || "No response generated.", "assistant");
+                input.value = "";
+            } catch (error) {
+                showError("Network issue. Please try again.");
+            } finally {
+                setSending(false);
+                input.focus();
+            }
         });
     });
 </script>

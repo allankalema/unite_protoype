@@ -1,21 +1,69 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Verify Certificate{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-10">
-    <div class="bg-white border rounded-xl p-8">
-        <h1 class="text-2xl font-bold">Certificate Verification</h1>
-        {% if certificate %}
-            <p class="mt-4 text-success font-semibold">Valid certificate.</p>
-            <div class="mt-5 space-y-2">
-                <p><span class="font-semibold">Teacher:</span> {{ certificate.user.profile.full_name|default:certificate.user.username }}</p>
-                <p><span class="font-semibold">Course:</span> {{ certificate.course.title }}</p>
-                <p><span class="font-semibold">Issue Date:</span> {{ certificate.issued_at|date:"F d, Y" }}</p>
-                <p><span class="font-semibold">Score:</span> {{ certificate.final_score }}%</p>
-                <p><span class="font-semibold">Verification Code:</span> {{ certificate.verification_code }}</p>
+<section class="max-w-6xl mx-auto px-4 py-8 lg:py-10 space-y-6">
+    <header class="bg-white border border-unite-gray-300 rounded-2xl p-6 lg:p-7">
+        <p class="text-xs uppercase tracking-wide text-unite-blue-600 font-semibold">Public Verification</p>
+        <h1 class="mt-1 text-3xl font-bold text-unite-navy-500">Certificate Verification</h1>
+        <p class="mt-2 text-unite-text-main">Verify whether a certificate issued by UNITE is authentic using its verification code.</p>
+        <div class="mt-3 text-sm text-unite-text-main">Verification code checked: <span class="font-semibold text-unite-navy-500 break-all">{{ code }}</span></div>
+    </header>
+
+    {% if certificate %}
+        <section class="bg-white border border-success rounded-2xl p-5 lg:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-success bg-white text-success text-sm font-semibold uppercase tracking-wide">
+                    <i class="fa-solid fa-circle-check"></i> Valid Certificate
+                </div>
+                <a href="{{ verify_url }}" class="text-sm text-unite-blue-500 hover:text-unite-blue-600 font-semibold">Verification Link</a>
             </div>
-        {% else %}
-            <p class="mt-4 text-error font-semibold">No certificate found for code: {{ code }}</p>
-        {% endif %}
-    </div>
-</div>
+
+            <article class="relative mt-5 bg-white rounded-2xl overflow-hidden">
+                <div class="absolute inset-2 border-2 {{ theme.outer_border }} rounded-xl pointer-events-none"></div>
+                <div class="absolute inset-5 border {{ theme.inner_border }} rounded-lg pointer-events-none"></div>
+                <div class="relative px-8 py-10 text-center">
+                    <img src="{% static 'UNITE_Logo.png' %}" alt="UNITE Logo" class="h-20 w-20 mx-auto rounded-full border border-unite-gray-300 object-cover">
+                    <p class="mt-3 text-xs tracking-[0.28em] uppercase text-unite-text-main">Uganda National Institute for Teacher Education</p>
+                    <h2 class="mt-3 text-3xl font-bold {{ theme.title_text }}">Certificate of Completion</h2>
+
+                    <div class="mt-3 flex flex-wrap justify-center gap-2">
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-unite-gray-300 {{ theme.badge_bg }} {{ theme.badge_text }} text-xs font-semibold uppercase tracking-wide">Level: {{ certificate_level }}</span>
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-success bg-white text-success text-xs font-semibold uppercase tracking-wide">
+                            <i class="fa-solid fa-circle-check"></i> Verified
+                        </span>
+                    </div>
+
+                    <p class="mt-6 text-lg text-unite-text-main">Awarded to</p>
+                    <p class="mt-1 text-3xl font-semibold text-unite-navy-500">{{ recipient_name }}</p>
+                    <p class="mt-5 text-lg text-unite-text-main">Course</p>
+                    <p class="mt-1 text-2xl font-semibold text-unite-navy-500">{{ certificate.course.title }}</p>
+
+                    <div class="mt-8 grid sm:grid-cols-3 gap-3 text-left">
+                        <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-3">
+                            <p class="text-xs uppercase tracking-wide text-unite-text-main">Certificate Number</p>
+                            <p class="mt-1 font-semibold text-unite-navy-500 break-all">{{ certificate.certificate_number }}</p>
+                        </div>
+                        <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-3">
+                            <p class="text-xs uppercase tracking-wide text-unite-text-main">Date Issued</p>
+                            <p class="mt-1 font-semibold text-unite-navy-500">{{ certificate.issued_at|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="bg-unite-gray-100 border border-unite-gray-300 rounded-xl p-3">
+                            <p class="text-xs uppercase tracking-wide text-unite-text-main">Verification Code</p>
+                            <p class="mt-1 font-semibold text-unite-navy-500 break-all">{{ certificate.verification_code }}</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    {% else %}
+        <section class="bg-white border border-error rounded-2xl p-8 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-error bg-white text-error text-sm font-semibold uppercase tracking-wide">
+                <i class="fa-solid fa-circle-xmark"></i> Invalid Certificate
+            </div>
+            <h2 class="mt-4 text-2xl font-bold text-unite-navy-500">No Matching Certificate Found</h2>
+            <p class="mt-2 text-unite-text-main">The code you provided does not match any certificate issued by this platform.</p>
+        </section>
+    {% endif %}
+</section>
 {% endblock %}

@@ -14,12 +14,16 @@ def _first_last_name(user):
     if profile and profile.full_name:
         full_name = profile.full_name.strip()
     if not full_name:
-        full_name = user.get_full_name().strip() or user.username
+        full_name = user.get_full_name().strip()
 
     parts = [part for part in full_name.split() if part]
     if len(parts) >= 2:
         return f"{parts[0]} {parts[-1]}"
-    return full_name
+    if user.first_name and user.last_name:
+        return f"{user.first_name.strip()} {user.last_name.strip()}".strip()
+    if len(parts) == 1:
+        return parts[0]
+    return "Name Not Set"
 
 
 def _level_theme(level):
@@ -91,4 +95,17 @@ def certificate_detail_view(request, certificate_id):
 
 def verify_certificate_view(request, code):
     certificate = Certificate.objects.filter(verification_code=code).select_related("course", "user", "user__profile").first()
-    return render(request, "certificates/verify.html", {"certificate": certificate, "code": code})
+    context = {"certificate": certificate, "code": code}
+    if certificate:
+        base_url = (settings.SITE_URL or "").rstrip("/") + "/"
+        verify_path = reverse("certificates:verify", kwargs={"code": certificate.verification_code})
+        verify_url = urljoin(base_url, verify_path.lstrip("/")) if base_url else verify_path
+        context.update(
+            {
+                "recipient_name": _first_last_name(certificate.user),
+                "certificate_level": certificate.course.get_level_display(),
+                "theme": _level_theme(certificate.course.level),
+                "verify_url": verify_url,
+            }
+        )
+    return render(request, "certificates/verify.html", context)

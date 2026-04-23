@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Course Catalog | UNITE eLearn{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 py-10">
@@ -34,7 +35,12 @@
             {% with course=row.course %}
                 <article class="bg-white border border-unite-gray-300 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
                     {% if course.cover_image %}
-                        <img src="{{ course.cover_image }}" alt="{{ course.title }}" class="h-44 w-full object-cover">
+                        <img
+                            src="{{ course.cover_image }}"
+                            alt="{{ course.title }}"
+                            class="h-44 w-full object-cover"
+                            onerror="this.onerror=null;this.src='{% static 'UNITE_Logo.png' %}';this.classList.remove('object-cover');this.classList.add('object-contain','p-8','bg-white');"
+                        >
                     {% else %}
                         <div class="h-44 bg-gradient-to-br from-unite-orange-100 via-white to-unite-blue-100 grid place-items-center text-unite-blue-500">
                             <div class="text-center">
